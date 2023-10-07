@@ -9,7 +9,8 @@
             <div class="ps-3">
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb mb-0 p-0">
-                        <li class="breadcrumb-item"><a href="{% url 'index' %}"><i class="bx bx-home-alt"></i></a>
+                        <li class="breadcrumb-item"><a href="{% url 'dashboard:index' %}"><i
+                                    class="bx bx-home-alt"></i></a>
                         </li>
                         <li class="breadcrumb-item active" aria-current="page">Publications</li>
                     </ol>
@@ -18,7 +19,7 @@
         </div>
         <!--end breadcrumb-->
         <h6 class="mb-0 text-uppercase">Publications Information</h6>
-        <hr/>
+        <hr />
         <div class="card">
             <div class="card-body">
                 <div class="table-responsive">
@@ -30,74 +31,26 @@
                                 <th>Cites By</th>
                                 <th>Year</th>
                                 <th>Journal</th>
-                                <th></th>
                             </tr>
                         </thead>
                         <tbody>
+                            {% if publications %}
+                            {% for publication in publications %}
                             <tr>
-                                <td>Sample Title 1</td>
-                                <td>Author 1, Author 2</td>
-                                <td>10</td>
-                                <td>2020</td>
-                                <td>Journal 1</td>
-                                <td></td>
+                                <td>
+                                    <a target="_blank" href="{% if publication.link %} {{publication.link}} {% else %} https://scholar.google.com/  {% endif %}">{{publication.title}}</a>
+                                </td>
+                                <td>{{publication.authors}}</td>
+                                <td>{{publication.citations}}</td>
+                                <td>{{publication.year}}</td>
+                                <td>{{publication.journal}}</td>
                             </tr>
+                            {% endfor %}
+                            {% else %}
                             <tr>
-                                <td>Sample Title 2</td>
-                                <td>Author 3, Author 4</td>
-                                <td>5</td>
-                                <td>2018</td>
-                                <td>Journal 2</td>
-                                <td></td>
+                                <td colspan="5">No Publications Found</td>
                             </tr>
-                            <tr>
-                                <td>Sample Title 1</td>
-                                <td>Author 1, Author 2</td>
-                                <td>10</td>
-                                <td>2020</td>
-                                <td>Journal 1</td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td>Sample Title 2</td>
-                                <td>Author 3, Author 4</td>
-                                <td>5</td>
-                                <td>2018</td>
-                                <td>Journal 2</td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td>Sample Title 1</td>
-                                <td>Author 1, Author 2</td>
-                                <td>10</td>
-                                <td>2020</td>
-                                <td>Journal 1</td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td>Sample Title 2</td>
-                                <td>Author 3, Author 4</td>
-                                <td>5</td>
-                                <td>2018</td>
-                                <td>Journal 2</td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td>Sample Title 1</td>
-                                <td>Author 1, Author 2</td>
-                                <td>10</td>
-                                <td>2020</td>
-                                <td>Journal 1</td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td>Sample Title 2</td>
-                                <td>Author 3, Author 4</td>
-                                <td>5</td>
-                                <td>2018</td>
-                                <td>Journal 2</td>
-                                <td></td>
-                            </tr>
+                            {% endif %}
                         </tbody>
                         <tfoot>
                             <tr>
@@ -106,7 +59,6 @@
                                 <th>Cites By</th>
                                 <th>Year</th>
                                 <th>Journal</th>
-                                <th></th>
                             </tr>
                         </tfoot>
                     </table>
@@ -118,23 +70,23 @@
 {% endblock %}
 {% block custom_scripts %}
 <script>
-	  
-    $(document).ready(function() {
-    $('#example').DataTable()
-  });
-    
-  </script>
-  
-  
-  <script>
-      $(document).ready(function() {
-          var table = $('#example2').DataTable( {
-              lengthChange: false,
-              buttons: [ 'copy', 'excel', 'pdf', 'print']
-          } );
-       
-          table.buttons().container()
-              .appendTo( '#example2_wrapper .col-md-6:eq(0)' );
-      } );
-  </script>
+
+    $(document).ready(function () {
+        $('#example').DataTable()
+    });
+
+</script>
+
+
+<script>
+    $(document).ready(function () {
+        var table = $('#example2').DataTable({
+            lengthChange: false,
+            buttons: ['copy', 'excel', 'pdf', 'print']
+        });
+
+        table.buttons().container()
+            .appendTo('#example2_wrapper .col-md-6:eq(0)');
+    });
+</script>
 {% endblock custom_scripts %}
