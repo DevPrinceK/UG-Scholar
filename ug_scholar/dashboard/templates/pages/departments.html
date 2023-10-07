@@ -1,5 +1,6 @@
 {% extends "base/base.html" %}
 {% load static %}
+{% load humanize %}
 {% block content %}
 <div class="page-wrapper">
     <div class="page-content">
@@ -15,11 +16,7 @@
                     </ol>
                 </nav>
             </div>
-            <div class="ms-auto">
-                <div class="btn-group">
-                    <button type="button" class="btn btn-light">Add</button>
-                </div>
-            </div>
+           
         </div>
         <!--end breadcrumb-->
         <h6 class="mb-0 text-uppercase">Departments Information</h6>
@@ -31,227 +28,42 @@
                         <thead>
                             <tr>
                                 <th>#</th>
-                                <th>NAME</th>
-                                <th>AUTS</th>
-                                <th>CITS</th>
-                                <th>PUBS</th>
-                                <th>2023</th>
-                                <th>2022</th>
-                                <th>2021</th>
+                                <th>Name</th>
+                                <th>AUTHORS</th>
+                                <th>PUBLICATIONS</th>
+                                <th>CITATIONS</th>
+                                <th>H-INDEX</th>
+                                <th>I10-INDEX</th>
                             </tr>
                         </thead>
                         <tbody>
+                            {% if department_breakdown_info %}
+                            {% for info in department_breakdown_info %}
                             <tr>
-                                <td>1</td>
-                                <td>CDAS</td>
-                                <td>250</td>
-                                <td>455</td>
-                                <td>61</td>
-                                <td>345|2345</td>
-                                <td>3450|1253</td>
-                                <td>3450|1253</td>
+                                <td>{{forloop.counter}}</td>
+                                <td>{{info.department}}</td>
+                                <td>{{info.total_authors|intcomma }}</td>
+                                <td>{{info.total_publications|intcomma }}</td>
+                                <td>{{info.total_citations|intcomma }}</td>
+                                <td>{{info.total_h_index|intcomma }}</td>
+                                <td>{{info.total_i10_index|intcomma }}</td>
                             </tr>
+                            {% endfor %}
+                            {% else %}
                             <tr>
-                                <td>1</td>
-                                <td>CDAS</td>
-                                <td>250</td>
-                                <td>455</td>
-                                <td>61</td>
-                                <td>345|2345</td>
-                                <td>3450|1253</td>
-                                <td>3450|1253</td>
+                                <td colspan="6" class="text-center">No Info Available</td>
                             </tr>
-                            <tr>
-                                <td>1</td>
-                                <td>CDAS</td>
-                                <td>250</td>
-                                <td>455</td>
-                                <td>61</td>
-                                <td>345|2345</td>
-                                <td>3450|1253</td>
-                                <td>3450|1253</td>
-                            </tr>
-                            <tr>
-                                <td>1</td>
-                                <td>CDAS</td>
-                                <td>250</td>
-                                <td>455</td>
-                                <td>61</td>
-                                <td>345|2345</td>
-                                <td>3450|1253</td>
-                                <td>3450|1253</td>
-                            </tr>
-                            <tr>
-                                <td>1</td>
-                                <td>CDAS</td>
-                                <td>250</td>
-                                <td>455</td>
-                                <td>61</td>
-                                <td>345|2345</td>
-                                <td>3450|1253</td>
-                                <td>3450|1253</td>
-                            </tr>
-                            <tr>
-                                <td>1</td>
-                                <td>CDAS</td>
-                                <td>250</td>
-                                <td>455</td>
-                                <td>61</td>
-                                <td>345|2345</td>
-                                <td>3450|1253</td>
-                                <td>3450|1253</td>
-                            </tr>
-                            <tr>
-                                <td>1</td>
-                                <td>CDAS</td>
-                                <td>250</td>
-                                <td>455</td>
-                                <td>61</td>
-                                <td>345|2345</td>
-                                <td>3450|1253</td>
-                                <td>3450|1253</td>
-                            </tr>
-                            <tr>
-                                <td>1</td>
-                                <td>CDAS</td>
-                                <td>250</td>
-                                <td>455</td>
-                                <td>61</td>
-                                <td>345|2345</td>
-                                <td>3450|1253</td>
-                                <td>3450|1253</td>
-                            </tr>
-                            <tr>
-                                <td>1</td>
-                                <td>CDAS</td>
-                                <td>250</td>
-                                <td>455</td>
-                                <td>61</td>
-                                <td>345|2345</td>
-                                <td>3450|1253</td>
-                                <td>3450|1253</td>
-                            </tr>
-                            <tr>
-                                <td>1</td>
-                                <td>CDAS</td>
-                                <td>250</td>
-                                <td>455</td>
-                                <td>61</td>
-                                <td>345|2345</td>
-                                <td>3450|1253</td>
-                                <td>3450|1253</td>
-                            </tr>
-                            <tr>
-                                <td>1</td>
-                                <td>CDAS</td>
-                                <td>250</td>
-                                <td>455</td>
-                                <td>61</td>
-                                <td>345|2345</td>
-                                <td>3450|1253</td>
-                                <td>3450|1253</td>
-                            </tr>
-                            <tr>
-                                <td>1</td>
-                                <td>CDAS</td>
-                                <td>250</td>
-                                <td>455</td>
-                                <td>61</td>
-                                <td>345|2345</td>
-                                <td>3450|1253</td>
-                                <td>3450|1253</td>
-                            </tr>
-                            <tr>
-                                <td>1</td>
-                                <td>CDAS</td>
-                                <td>250</td>
-                                <td>455</td>
-                                <td>61</td>
-                                <td>345|2345</td>
-                                <td>3450|1253</td>
-                                <td>3450|1253</td>
-                            </tr>
-                            <tr>
-                                <td>1</td>
-                                <td>CDAS</td>
-                                <td>250</td>
-                                <td>455</td>
-                                <td>61</td>
-                                <td>345|2345</td>
-                                <td>3450|1253</td>
-                                <td>3450|1253</td>
-                            </tr>
-                            <tr>
-                                <td>1</td>
-                                <td>CDAS</td>
-                                <td>250</td>
-                                <td>455</td>
-                                <td>61</td>
-                                <td>345|2345</td>
-                                <td>3450|1253</td>
-                                <td>3450|1253</td>
-                            </tr>
-                            <tr>
-                                <td>1</td>
-                                <td>CDAS</td>
-                                <td>250</td>
-                                <td>455</td>
-                                <td>61</td>
-                                <td>345|2345</td>
-                                <td>3450|1253</td>
-                                <td>3450|1253</td>
-                            </tr>
-                            <tr>
-                                <td>1</td>
-                                <td>CDAS</td>
-                                <td>250</td>
-                                <td>455</td>
-                                <td>61</td>
-                                <td>345|2345</td>
-                                <td>3450|1253</td>
-                                <td>3450|1253</td>
-                            </tr>
-                            <tr>
-                                <td>1</td>
-                                <td>CDAS</td>
-                                <td>250</td>
-                                <td>455</td>
-                                <td>61</td>
-                                <td>345|2345</td>
-                                <td>3450|1253</td>
-                                <td>3450|1253</td>
-                            </tr>
-                            <tr>
-                                <td>1</td>
-                                <td>CDAS</td>
-                                <td>250</td>
-                                <td>455</td>
-                                <td>61</td>
-                                <td>345|2345</td>
-                                <td>3450|1253</td>
-                                <td>3450|1253</td>
-                            </tr>
-                            <tr>
-                                <td>1</td>
-                                <td>CDAS</td>
-                                <td>250</td>
-                                <td>455</td>
-                                <td>61</td>
-                                <td>345|2345</td>
-                                <td>3450|1253</td>
-                                <td>3450|1253</td>
-                            </tr>
+                            {% endif %}
                         </tbody>
                         <tfoot>
                             <tr>
                                 <th>#</th>
-                                <th>NAME</th>
-                                <th>AUTS</th>
-                                <th>CITS</th>
-                                <th>PUBS</th>
-                                <th>2023</th>
-                                <th>2022</th>
-                                <th>2021</th>
+                                <th>Name</th>
+                                <th>AUTHORS</th>
+                                <th>PUBLICATIONS</th>
+                                <th>CITATIONS</th>
+                                <th>H-INDEX</th>
+                                <th>I10-INDEX</th>
                             </tr>
                         </tfoot>
                     </table>
