@@ -2,10 +2,10 @@
 <div class="sidebar-wrapper" data-simplebar="true">
     <div class="sidebar-header">
         <div>
-            <img src="{% static 'dashboard/assets/images/logo.png' %}" class="logo-icon" alt="logo icon">
+            <img src="{% static 'dashboard/assets/images/logo.png' %}" style="height: 40px; width:auto;" class="logo-icon" alt="logo icon">
         </div>
         <div>
-            <h4 class="logo-text">UG Scholar</h4>
+            <h4 class="logo-text">IntelliSphere</h4>
         </div>
         <div class="toggle-icon ms-auto"><i class='bx bx-arrow-back'></i>
         </div>
@@ -13,21 +13,21 @@
     <!--navigation-->
     <ul class="metismenu" id="menu">
         <li>
-            <a href="{% url 'index' %}">
+            <a href="{% url 'dashboard:index' %}">
                 <div class="parent-icon"><i class='bx bx-home'></i>
                 </div>
                 <div class="menu-title">Dashboard</div>
             </a>
         </li>
         <li>
-            <a href="{% url 'authors' %}">
+            <a href="{% url 'dashboard:authors' %}">
                 <div class="parent-icon"><i class='bx bx-group'></i>
                 </div>
                 <div class="menu-title">Authors</div>
             </a>
         </li>
         <li>
-            <a href="{% url 'publications' %}">
+            <a href="{% url 'dashboard:publications' %}">
                 <div class="parent-icon"><i class='bx bx-book-content'></i>
                 </div>
                 <div class="menu-title">Publications</div>
@@ -41,11 +41,11 @@
                 <div class="menu-title">Break Down</div>
             </a>
             <ul>
-                <li> <a href="{% url 'colleges' %}"><i class='bx bx-radio-circle'></i>Colleges</a>
+                <li> <a href="{% url 'dashboard:colleges' %}"><i class='bx bx-radio-circle'></i>Colleges</a>
                 </li>
-                <li> <a href="{% url 'faculties' %}"><i class='bx bx-radio-circle'></i>Faculties</a>
+                <li> <a href="{% url 'dashboard:faculties' %}"><i class='bx bx-radio-circle'></i>Faculties</a>
                 </li>
-                <li> <a href="{% url 'departments' %}"><i class='bx bx-radio-circle'></i>Departments</a>
+                <li> <a href="{% url 'dashboard:departments' %}"><i class='bx bx-radio-circle'></i>Departments</a>
                 </li>
             </ul>
         </li>
