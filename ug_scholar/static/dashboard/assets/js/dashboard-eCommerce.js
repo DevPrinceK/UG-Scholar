@@ -2,17 +2,32 @@ $(function() {
     "use strict";
 
 
-    // chart1
-    var ctx = document.getElementById('chart1').getContext('2d');
+    // chart1 - Performance
+    // Parse the dynamic data from the Django context
+    var chartDataElementTopJournals = document.getElementById('chart1');
+    var performanceDataTopJournals = JSON.parse(chartDataElementTopJournals.getAttribute('data-performance'));
 
+    // Extract years, publicationsData, and citationsData from the parsed data
+    var journalNames = performanceDataTopJournals.map(function(entry) {
+        return entry.journal;
+    });
+
+    var publicationsDataTopJournals = performanceDataTopJournals.map(function(entry) {
+        return entry.total_publications;
+    });
+
+    var citationsDataTopJournals = performanceDataTopJournals.map(function(entry) {
+        return entry.total_citations;
+    });
+    var ctx = document.getElementById('chart1').getContext('2d');
     var myChart = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+            labels: journalNames,
             datasets: [{
-                    label: 'Page Views',
+                    label: 'Publications',
 
-                    data: [20, 35, 30, 35, 28, 22, 25],
+                    data: publicationsDataTopJournals,
                     backgroundColor: [
                         "#fff"
                     ],
@@ -23,24 +38,13 @@ $(function() {
                     borderRadius: 20
                 },
                 {
-                    label: 'Sales',
-                    data: [15, 22, 13, 25, 20, 10, 15],
+                    label: 'Citations',
+                    data: citationsDataTopJournals,
                     backgroundColor: [
                         "rgb(255 255 255 / 50%)"
                     ],
                     borderColor: [
                         "rgb(255 255 255 / 50%)"
-                    ],
-                    borderWidth: 0,
-                    borderRadius: 20
-                }, {
-                    label: 'Conversion',
-                    data: [10, 15, 9, 15, 17, 16, 10],
-                    backgroundColor: [
-                        "rgb(255 255 255 / 25%)"
-                    ],
-                    borderColor: [
-                        "rgb(255 255 255 / 25%)"
                     ],
                     borderWidth: 0,
                     borderRadius: 20
@@ -54,6 +58,100 @@ $(function() {
             plugins: {
                 legend: {
                     position: 'bottom',
+                    display: true,
+                    labels: {
+                        color: 'rgb(255 255 255 / 75%)'
+                    }
+
+                }
+            },
+            scales: {
+                x: {
+                    stacked: false,
+                    beginAtZero: true,
+                    ticks: {
+                        color: "rgb(255 255 255 / 75%)", // this here
+                        display: false
+                    },
+                    grid: {
+                        display: false,
+                        color: "rgba(221, 221, 221, 0.08)"
+                    }
+                },
+                y: {
+                    stacked: false,
+                    beginAtZero: true,
+                    ticks: {
+                        color: "rgb(255 255 255 / 75%)", // this here
+                    },
+                    grid: {
+                        display: true,
+                        color: "rgba(221, 221, 221, 0.08)"
+                    }
+                },
+
+            }
+        }
+    });
+
+
+     // Parse the dynamic data from the Django context
+     var chartDataElement = document.getElementById('chart3YearsPerformance');
+     console.log(chartDataElement.getAttribute('data-performance'))
+     var performanceData = JSON.parse(chartDataElement.getAttribute('data-performance'));
+ 
+     // Extract years, publicationsData, and citationsData from the parsed data
+     var years = performanceData.map(function(entry) {
+         return entry.year;
+     });
+ 
+     var publicationsData = performanceData.map(function(entry) {
+         return entry.total_publications;
+     });
+ 
+     var citationsData = performanceData.map(function(entry) {
+         return entry.total_citations;
+     });
+    // 3 years Performance
+    var ctx = document.getElementById('chart3YearsPerformance').getContext('2d');
+    var myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: years,
+            datasets: [{
+                    label: 'Publications',
+
+                    data: publicationsData,
+                    backgroundColor: [
+                        "#fff"
+                    ],
+                    borderColor: [
+                        "#fff"
+                    ],
+                    borderWidth: 0,
+                    borderRadius: 20
+                },
+                {
+                    label: 'Citations',
+                    data: citationsData,
+                    backgroundColor: [
+                        "rgb(255 255 255 / 50%)"
+                    ],
+                    borderColor: [
+                        "rgb(255 255 255 / 50%)"
+                    ],
+                    borderWidth: 0,
+                    borderRadius: 20
+                }
+            ]
+        },
+        options: {
+            maintainAspectRatio: false,
+            barPercentage: 0.7,
+            categoryPercentage: 0.45,
+            plugins: {
+                legend: {
+                    position: 'top',
                     display: true,
                     labels: {
                         color: 'rgb(255 255 255 / 75%)'
@@ -91,15 +189,28 @@ $(function() {
 
 
 
-    // chart2
+    // chart2 - Schools publications
+    // Parse the dynamic data from the Django context
+    var chartDataElementTopSchools = document.getElementById('chart2');
+    var performanceDataTopSchools = JSON.parse(chartDataElementTopSchools.getAttribute('data-performance'));
+
+    // Extract years, publicationsData, and citationsData from the parsed data
+    var schoolNames = performanceDataTopSchools.map(function(entry) {
+        return entry.school;
+    });
+
+    var publicationsDataSchools = performanceDataTopSchools.map(function(entry) {
+        return entry.total_publications;
+    });
+
     var ctx = document.getElementById('chart2').getContext('2d');
 
     var myChart = new Chart(ctx, {
         type: 'pie',
         data: {
-            labels: ['Desktop', 'Mobile', 'Tablet'],
+            labels: schoolNames,
             datasets: [{
-                data: [155, 120, 110],
+                data: publicationsDataSchools,
                 backgroundColor: [
                     "rgb(255 255 255 / 100%)",
                     "rgb(255 255 255 / 50%)",
@@ -121,19 +232,33 @@ $(function() {
     });
 
 
+    // 7 Years Performance Graph - chart3
+    // Parse the dynamic data from the Django context
+    var chartDataElement10Years = document.getElementById('chart3');
+    var performanceData10Years = JSON.parse(chartDataElement10Years.getAttribute('data-performance'));
 
+    // Extract years, publicationsData, and citationsData from the parsed data
+    var years10Years = performanceData10Years.map(function(entry) {
+        return entry.year;
+    });
 
+    var publicationsData10Years = performanceData10Years.map(function(entry) {
+        return entry.total_publications;
+    });
 
-    // chart3
+    var citationsData10Years = performanceData10Years.map(function(entry) {
+        return entry.total_citations;
+    });
+
     var ctx = document.getElementById('chart3').getContext('2d');
 
     var myChart = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'],
+            labels: years10Years,
             datasets: [{
-                label: 'Visitors',
-                data: [12, 25, 13, 25, 14, 35, 10],
+                label: 'Publications',
+                data: publicationsData10Years,
                 backgroundColor: [
                     "rgb(255 255 255 / 100%)",
                 ],
@@ -147,13 +272,29 @@ $(function() {
                     "rgb(255 255 255 / 100%)",
                 ],
                 borderWidth: 4
-            }]
+            },{
+                label: 'Citations',
+                data: citationsData10Years,
+                backgroundColor: [
+                    "rgb(255 255 255 /50%)",
+                ],
+                fill: {
+                    target: 'origin',
+                    above: 'rgb(255 255 255 / 20%)', // Area will be red above the origin
+                    below: 'rgb(255 255 255 / 20%)' // And blue below the origin
+                },
+                tension: 0.4,
+                borderColor: [
+                    "rgb(255 255 255 /50%)",
+                ],
+                borderWidth: 4
+            }, ]
         },
         options: {
             maintainAspectRatio: false,
             plugins: {
                 legend: {
-                    display: false,
+                    display: true,
                 }
             },
             scales: {
