@@ -10,7 +10,32 @@ class CollegesView(View):
     template_name = 'pages/colleges.html'
     
     def get(self, request):
-        return render(request, self.template_name)
+         # !!!!!!!! college breakdown info
+        # Query to get unique colleges along with their information
+        college_breakdown_info = Profile.objects.values('college').annotate(
+            total_authors=Count('id'),
+            authors_with_publications=Count('author__publications', distinct=True),
+            total_publications=Count('author__publications'),
+            total_citations=Sum('author__publications__citations'),
+        ).order_by('college')
+
+        # Calculate total_h_index and total_i10_index
+        for college in college_breakdown_info:
+            authors = Profile.objects.filter(college=college['college'])
+            total_autors = authors.count()
+            authors_with_publications = authors.filter(author__publications__isnull=False).distinct().count() #noqa
+            total_h_index = sum(author.get_author_hindex() for author in authors)
+            total_i10_index = sum(author.get_author_i10index() for author in authors)
+            
+            college['total_authors'] = total_autors
+            college['authors_with_publications'] = authors_with_publications
+            college['total_h_index'] = total_h_index
+            college['total_i10_index'] = total_i10_index
+            
+        context = {
+            'college_breakdown_info': college_breakdown_info,
+        }
+        return render(request, self.template_name, context)
  
     
 class FacultiesView(View):
@@ -47,6 +72,7 @@ class DepartmentsView(View):
             department['authors_with_publications'] = authors_with_publications
             department['total_h_index'] = total_h_index
             department['total_i10_index'] = total_i10_index
+            
         
         context = {
             'department_breakdown_info': department_breakdown_info,
