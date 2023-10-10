@@ -38,6 +38,7 @@
                                 <p class="mb-0 font-13 text-white">i10-index</p>
                             </div>
                         </div>
+                        <div class="mb-4"><p></p><p></p></div>
                     </div>
                 </div>
             </div>
@@ -46,7 +47,7 @@
                     <div class="card-body">
                         <p class="my-1 text-white">Publications</p>
                         {% for college in college_publications %}
-                        <div class="progress mb-2" data-bs-toggle="tooltip" data-bs-placement="top"
+                        <div class="progress mb-2" style="height: 29px;" data-bs-toggle="tooltip" data-bs-placement="top"
                             title="{{college.college}} ({{college.total_publications|intcomma }}) ">
                             <div class="progress-bar" role="progressbar"
                                 style="width: {{college.percentages}}%; color: rgb(58, 165, 201)"
@@ -62,7 +63,7 @@
                     <div class="card-body">
                         <p class="my-1 text-white">Citations Breakdown</p>
                         {% for college in college_citations %}
-                        <div class="progress mb-2" data-bs-toggle="tooltip" data-bs-placement="top"
+                        <div class="progress mb-2" style="height: 29px;" data-bs-toggle="tooltip" data-bs-placement="top"
                             title="{{college.college}} ({{college.total_citations|intcomma }})">
                             <div class="progress-bar" role="progressbar"
                                 style="width: {{college.percentage}}%; color: rgb(58, 165, 201)"
@@ -144,7 +145,7 @@
                                 <h5 class="mb-1">College Breakdown</h5>
                             </div>
                             <div class="ms-auto">
-                                <a href="javscript:;" class="btn btn-light btn-sm radius-30">View All</a>
+                                <a href="{% url 'dashboard:colleges' %}" class="btn btn-light btn-sm radius-30">View All</a>
                             </div>
                         </div>
 
