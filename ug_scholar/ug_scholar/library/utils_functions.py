@@ -43,7 +43,7 @@ def scrape_author_data(author_id: str = "Tpwr9vwAAAAJ") -> dict:
     STIGAR = "4f940edc13eccb5c0f58327859400c2daab057d5fb1aadfdd4cc1ad9d28cbf89" #noqa
     ERNEST = "7c6cd4ed1b4a2a61f435b25f44bda533e9814853ca5e53ca29f5940088354673" #noqa
     params = {
-        "api_key": TAWIAH,
+        "api_key": MINE,
         "engine": "google_scholar_author",
         "hl": "en",
         "author_id": author_id  # "Tpwr9vwAAAAJ" - default
