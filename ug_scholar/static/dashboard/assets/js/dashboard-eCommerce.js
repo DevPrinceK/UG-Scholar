@@ -19,15 +19,20 @@ $(function() {
     var citationsDataTopJournals = performanceDataTopJournals.map(function(entry) {
         return entry.total_citations;
     });
+
+    //     console.log(performanceDataTopJournals);
+    // console.log(publicationsDataTopJournals);
+    // console.log(citationsDataTopJournals);
+
     var ctx = document.getElementById('chart1').getContext('2d');
     var myChart = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: journalNames,
+            labels: journalNames.slice(1),
             datasets: [{
                     label: 'Publications',
 
-                    data: publicationsDataTopJournals,
+                    data: publicationsDataTopJournals.slice(1),
                     backgroundColor: [
                         "#fff"
                     ],
@@ -39,7 +44,7 @@ $(function() {
                 },
                 {
                     label: 'Citations',
-                    data: citationsDataTopJournals,
+                    data: citationsDataTopJournals.slice(1),
                     backgroundColor: [
                         "rgb(255 255 255 / 50%)"
                     ],
