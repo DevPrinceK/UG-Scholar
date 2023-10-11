@@ -3,6 +3,17 @@
 {% block content %}
 <div class="page-wrapper">
     <div class="page-content">
+        {% if messages %}
+        {% for message in messages %}
+        <div class="container">
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                {{message}}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
+        </div>
+        {% endfor %}
+        {% endif %}
+
         <!--breadcrumb-->
         <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
             <div class="breadcrumb-title pe-3">Authors</div>
@@ -17,7 +28,7 @@
             </div>
             <div class="ms-auto">
                 <div class="btn-group">
-                    <button type="button" class="btn btn-light">Add</button>
+                    <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#authorForm">New Author</button>
                 </div>
             </div>
         </div>
@@ -43,7 +54,7 @@
                             {% if authors %}
                             {% for author in authors %}
                             <tr>
-                                <td> <img src="{{author.thumbnail}}" style="height: 60px; width:auto;"></td> 
+                                <td> <img src=" {% if author.thumbnail %} {{author.thumbnail}} {% else %} https://scholar.google.com/citations/images/avatar_scholar_128.png {% endif %} " style="height: 60px; width:auto;"></td> 
                                 <td>{{author.name}} <br> <small style="color: lightblue;">{{author.college}}</small> </td> 
                                 <td>{{author.rank}}</td> 
                                 <td>{{author.get_author_publications}}</td>
@@ -76,6 +87,78 @@
         </div>
     </div>
 </div>
+
+<!-- Author form modal -->
+<div class="modal fade" id="authorForm" tabindex="-1" aria-labelledby="authorFormLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable"" >
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="authorFormLabel">Create Author</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <form action="{% url 'dashboard:create_author' %}" method="POST">
+                {% csrf_token %}
+                <div class="form-group mb-2">
+                    <label for="name">Name</label>
+                    <input type="text" name="name" placeholder="Author Name" class="form-control">
+                </div>
+                <div class="form-group mb-2">
+                    <label for="email">Email</label>
+                    <input type="email" name="email" placeholder="eg. princek@gmail.com" class="form-control">
+                </div>
+                <div class="form-group mb-2">
+                    <label for="rank">Rank</label>
+                    <input type="text" name="rank" placeholder="eg. Associate Professor" class="form-control">
+                </div>
+                <div class="form-group mb-2">
+                    <label for="scholar_id">Scholar ID</label>
+                    <input type="text" name="scholar_id" placeholder="Google Scholar ID" class="form-control">
+                </div>
+                <div class="form-group mb-2">
+                    <label for="affiliation">Affiliation</label>
+                    <input type="text" name="affiliation" placeholder="eg. University of Ghana" class="form-control">
+                </div>
+                <div class="form-group mb-2">
+                    <label for="interests">Interests</label>
+                    <input type="text" name="interests" placeholder="eg. Cloud Computing, Artificial Intelligence" class="form-control">
+                </div>
+                <div class="form-group mb-2">
+                    <label for="college">College</label>
+                    <select class="form-control" name="college" id="college">
+                        {% for college in colleges %}
+                        <option value="{{college}}">{{college}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group mb-2">
+                    <label for="school">School / Institution</label>
+                    <select class="form-control" name="school" id="school">
+                        {% for school in schools %}
+                        <option value="{{school}}">{{school}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group mb-2">
+                    <label for="department">Department</label>
+                    <select class="form-control" name="department" id="department">
+                        {% for department in departments %}
+                        <option value="{{department}}">{{department}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save Author</button>
+                  </div>
+            </form>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+
 {% endblock %}
 {% block custom_scripts %}
 <script>
