@@ -3,6 +3,7 @@ from django.shortcuts import render, redirect
 from django.views import View
 from django.contrib import messages
 from django.utils.html import strip_tags
+from accounts.models import User
 
 from api.models import Author, Profile
 from dashboard.forms import AuthorProfileForm
@@ -61,3 +62,15 @@ class CreateUpdateAuthorView(View):
                 message = f"{field.title()}: {strip_tags(error)}"
                 messages.info(request, message)
                 return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
+
+
+class CreateUpdateAdministratorView(View):
+    '''Renders the administrators page'''
+    template_name = 'pages/administrators.html'
+    
+    def get(self, request):
+        administrators = User.objects.all()
+        context = {
+            'administrators': administrators
+        }
+        return render(request, self.template_name, context)
