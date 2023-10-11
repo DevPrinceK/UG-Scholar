@@ -1,0 +1,125 @@
+
+class UG:
+    '''UG Constants'''
+    
+    colleges = [
+            "College of Health Sciences",
+            "College of Basic and Applied Sciences",
+            "College of Education",
+            "College of Humanities",
+        ]
+    
+    schools = [
+        "School of Medicine and Dentistry",
+        "School of Veterinary Medicine",
+    ]
+    
+    departments = [
+    "Family and Consumer Sciences",
+    "Nutrition and Food Science",
+    "Food Process Engineering",
+    "Obstetrics and Gynecology",
+    "French",
+    "Oral and Maxillofacial Surgery",
+    "Haematology",
+    "Oral Pathology and Medicine",
+    "History",
+    "Oral Biology",
+    "Health Policy, Planning and Manage",
+    "Orthodontics and Paedodontics",
+    "Information Studies",
+    "Pathology",
+    "Marine and Fisheries Sciences",
+    "Pharmaceutical Chemistry",
+    "Mathematics",
+    "Preventive and Community Dentistry",
+    "Maternal and Child Health",
+    "Population, Family and Reproduction Health",
+    "Anaesthesia",
+    "Archaeology and Heritage Studies",
+    "Audiology, Speech and Language",
+    "Biochemistry, Cell and Molecular Biology",
+    "Chemical Pathology",
+    "Biological, Environmental and Occupational Health",
+    "Occupational Therapy",
+    "Biomaterial Sciences",
+    "Geography and Resource Development",
+    "Biomedical Engineering",
+    "Computer Engineering",
+    "Biostatistics",
+    "Finance",
+    "Chemistry",
+    "Accounting",
+    "Child Health",
+    "Marketing & Entrepreneurship",
+    "Community Health",
+    "Organisation and HR Management",
+    "Community Health",
+    "Public Administration and Health",
+    "Communication Studies",
+    "Adult Health",
+    "Crop Science",
+    "Agricultural Economics and Agribusiness",
+    "Dance",
+    "Adult Education and Community Development",
+    "Distance Learning",
+    "Agricultural Engineering",
+    "Plant and Environmental Biology",
+    "Agricultural Extension",
+    "Earth Science",
+    "Anatomy",
+    "Epidemiology and Disease Control",
+    "Animal Science",
+    "English",
+    "Medical Biochemistry",
+    "Philosophy and Classics",
+    "Medicine and Therapeutic",
+    "Pharmacognosy and Herbal Medicine",
+    "Mental Health",
+    "Physical Education and Sports",
+    "Medical Laboratory Sciences",
+    "Physics",
+    "Modern Languages",
+    "Physiology",
+    "Materials Science and Engineering",
+    "Physiotherapy",
+    "Music",
+    "Pharmaceutics and Microbiology",
+    "Nutrition and Dietetics",
+    "Pharmacy Practice and Clinical Pharmacy",
+    "Political Science",
+    "Sociology",
+    "Political Science",
+    "Soil Science",
+    "Psychiatry",
+    "Statistics",
+    "Psychology",
+    "Surgery",
+    "Pharmacology and Toxicology",
+    "Teacher Education and Leadership",
+    "Radiography",
+    "Theatre",
+    "Radiology",
+    "Computer Science",
+    "Restorative Dentistry",
+    "Medical Microbiology",
+    "Research, Education and Administration",
+    "Operations and MIS",
+    "Religions",
+    "Animal Biology and Conservation Science",
+    "Social and Behavioural Sciences",
+    "Economics",
+    "Social Work",
+    "Linguistics"
+]
+
+    
+    
+    def get_colleges(self):
+        return self.colleges
+    
+    def get_departments(self):
+        return self.departments
+    
+    def get_schools(self):
+        return self.schools
