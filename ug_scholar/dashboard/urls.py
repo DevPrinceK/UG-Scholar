@@ -8,6 +8,12 @@ urlpatterns = [
     path('', views.IndexView.as_view(), name='index'),
 ]
 
+# administrators
+urlpatterns += [
+    path('administrators/', views.AdministratorsView.as_view(), name='administrators'),
+    path('create-administrator/', views.CreateUpdateAdministratorView.as_view(), name='create_administrator'),
+]
+
 # author and publications
 urlpatterns += [
     path('authors/', views.AuthorsView.as_view(), name='authors'),
