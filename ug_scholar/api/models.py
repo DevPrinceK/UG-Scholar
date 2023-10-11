@@ -29,8 +29,6 @@ class Profile(models.Model):
     thumbnail = models.CharField(max_length=200, blank=True, null=True)
     interests = models.CharField(max_length=500, blank=True, null=True)
     statistics = models.CharField(max_length=500, blank=True, null=True)
-    h_index = models.IntegerField(default=0) # remove this later
-    i10_index = models.IntegerField(default=0) # remove this later
     rank = models.CharField(max_length=50, blank=True, null=True)
     email = models.CharField(max_length=100, blank=True, null=True)
     college = models.CharField(max_length=200,  blank=True, null=True)
