@@ -11,6 +11,13 @@ class Publication(models.Model):
     authors = models.CharField(max_length=500, blank=True, null=True)
     journal = models.CharField(max_length=500, blank=True, null=True)
     citations = models.IntegerField(unique=False)
+    
+    def get_author_name(self) -> str:
+        author = Author.objects.filter(publications=self).first()
+        if author:
+            return author.profile.name or author.profile.scholar_id
+        else:
+            return "Anonymous"
 
     def __str__(self):
         return self.title
