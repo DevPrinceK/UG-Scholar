@@ -259,11 +259,10 @@
                                     <h6 class="mb-0"> <a target="_blank"
                                             href="{% if publication.link %} {{publication.link}} {% else %} https://scholar.google.com/ {% endif %} ">{{publication.title}}</a>
                                     </h6>
+                                    <p class="mb-1">{{publication.get_author_name}}</p>
                                     <p class="mb-0">{{publication.citations|intcomma }} Cites</p>
                                 </div>
-                                <div class="">
-                                    <h6 class="mb-0"></h6>
-                                </div>
+                               
                             </div>
                         </div>
                         {% endfor %}
@@ -323,8 +322,6 @@
                     <div class="ms-auto">
                         <a href="{% url 'dashboard:departments' %}" class="btn btn-light btn-sm radius-30">View All</a>
                     </div>
-                    <!-- <div class="font-22 ms-auto"><i class='bx bx-dots-horizontal-rounded'></i>
-                    </div> -->
                 </div>
                 <hr />
                 <div class="table-responsive">
