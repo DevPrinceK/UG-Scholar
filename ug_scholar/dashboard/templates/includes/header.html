@@ -101,23 +101,65 @@
                     
                 </ul>
             </div>
+
             <div class="user-box dropdown px-3">
                 <a class="d-flex align-items-center nav-link dropdown-toggle gap-3 dropdown-toggle-nocaret" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                     <img src="{% static 'dashboard/assets/images/app/google-scholar.png' %}" class="user-img" alt="user avatar">
+                    
                     <!-- Do conditional rendering here - only admins -->
+                    {% if request.user.is_authenticated and request.user.is_superuser or request.user.is_staff %}
                     <div class="user-info">
-                        <p class="user-name mb-0">Prince Ofori</p>
-                        <p class="designattion mb-0">Administrator</p>
+                        <p class="user-name mb-0">{{ request.user.fullname }}</p>
+                        {% if request.user.is_superuser %}
+                        <p class="designation mb-0">Superuser</p>
+                        {% elif request.user.is_staff %}
+                        <p class="designation mb-0">Staff</p>
+                        {% endif %}
                     </div>
+                    {% endif %}
                 </a>
                 <!-- Do conditional rendering here - only admins -->
                 <ul class="dropdown-menu dropdown-menu-end">
-                    <li><a class="dropdown-item d-flex align-items-center" href="javascript:;"><i class="bx bx-user fs-5"></i><span>Profile</span></a>
-                    </li>
-                    <li><a class="dropdown-item d-flex align-items-center" href="{% url 'accounts:login' %}"><i class="bx bx-log-out-circle"></i><span>Logout</span></a>
-                    </li>
+                    <li><a class="dropdown-item d-flex align-items-center" href="javascript:;"><i class="bx bx-user fs-5"></i><span>Profile</span></a></li>
+                    {% if request.user.is_authenticated and request.user.is_superuser or request.user.is_staff %}
+                    <li><a class="dropdown-item d-flex align-items-center" href="{% url 'accounts:logout' %}"><i class="bx bx-log-out-circle"></i><span>Logout</span></a></li>
+                    {% else %}
+                    <button type="button" class="btn btn-light" style="width: 100%;" data-bs-toggle="modal" data-bs-target="#loginModal">Login</button>
+                    {% endif %}
                 </ul>
             </div>
+            
+
         </nav>
     </div>
 </header>
+
+<!-- Login form modal -->
+<div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable"" >
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="loginModalLabel">Login</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <form action="{% url 'accounts:login' %}" method="POST">
+                {% csrf_token %}
+                <div class="form-group mb-2">
+                    <label for="email">Email</label>
+                    <input type="email" name="email" placeholder="eg. princek@gmail.com" class="form-control">
+                </div>
+                <div class="form-group mb-2">
+                    <label for="password">Password</label>
+                    <input type="password" name="password" placeholder="Enter password" class="form-control">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Login As Staff</button>
+                  </div>
+            </form>
+        </div>
+        
+      </div>
+    </div>
+  </div>
