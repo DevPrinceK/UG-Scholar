@@ -16,11 +16,6 @@
                     </ol>
                 </nav>
             </div>
-            <!-- <div class="ms-auto">
-                <div class="btn-group">
-                    <button type="button" class="btn btn-light">Add</button>
-                </div>
-            </div> -->
         </div>
         <!--end breadcrumb-->
         <!-- colleges charts section -->
@@ -28,7 +23,7 @@
             <div class="col-12 col-lg-6">
                 <div class="card radius-10">
                     <div class="card-body">
-                      <div id="chart13"></div>
+                      <div id="chart13" data-performance="{{college_breakdown_json}}"></div>
                     </div>
                 </div>
             </div>
@@ -61,7 +56,7 @@
                             {% if college_breakdown_info %}
                                     {% for info in college_breakdown_info %}
                                     <tr>
-                                        <td>{{info.college}}</td>
+                                        <td><a href="{% url 'dashboard:college_details' %}?college={{info.college}}">{{info.college}}</a></td>
                                         <td>
                                             <div class="d-flex align-items-center">
                                                 <div class="ms-2">
@@ -100,7 +95,8 @@
 </div>
 {% endblock %}
 {% block custom_scripts %}
-
+<!-- <script src="https://code.highcharts.com/highcharts.js"></script> -->
+<script src="{% static 'dashboard/assets/js/highcharts.js' %}"></script>
 <script src="{% static 'dashboard/assets/js/chart-colleges.js' %}"></script>
 <script>
 	  
