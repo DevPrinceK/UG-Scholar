@@ -13,7 +13,6 @@
         </div>
         {% endfor %}
         {% endif %}
-
         <!--breadcrumb-->
         <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
             <div class="breadcrumb-title pe-3">Administrators</div>
@@ -26,11 +25,15 @@
                     </ol>
                 </nav>
             </div>
+
+            {% if request.user.is_superuser or request.user.staff %}
             <div class="ms-auto">
                 <div class="btn-group">
                     <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#adminForm">New Administrator</button>
                 </div>
             </div>
+            {% endif %}
+
         </div>
         <!--end breadcrumb-->
         <h6 class="mb-0 text-uppercase">Administrators Information</h6>
@@ -85,7 +88,7 @@
     </div>
 </div>
 
-<!-- Author form modal -->
+<!-- Adminisitrator form modal -->
 <div class="modal fade" id="adminForm" tabindex="-1" aria-labelledby="adminFormLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable"" >
       <div class="modal-content">
