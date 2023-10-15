@@ -41,7 +41,7 @@
                             {% for info in department_breakdown_info %}
                             <tr>
                                 <td>{{forloop.counter}}</td>
-                                <td>{{info.department}}</td>
+                                <td><a href="{% url 'dashboard:department_details' %}?department={{info.department}}">{{info.department}}</a></td>
                                 <td>{{info.total_authors|intcomma }}</td>
                                 <td>{{info.total_publications|intcomma }}</td>
                                 <td>{{info.total_citations|intcomma }}</td>
