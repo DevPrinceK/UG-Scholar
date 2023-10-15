@@ -4,8 +4,19 @@
 {% block content %}
 <div class="page-wrapper">
     <div class="page-content">
-        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-2 row-cols-xl-4">
+        
+        {% if messages %}
+        {% for message in messages %}
+        <div class="container">
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                {{message}}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
+        </div>
+        {% endfor %}
+        {% endif %}
 
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-2 row-cols-xl-4">
             <div class="col">
                 <div class="card radius-10">
                     <div class="card-body">
