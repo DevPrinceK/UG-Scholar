@@ -26,11 +26,14 @@
                     </ol>
                 </nav>
             </div>
+
+            {% if request.user.is_superuser or request.user.staff %}
             <div class="ms-auto">
                 <div class="btn-group">
                     <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#authorForm">New Author</button>
                 </div>
             </div>
+            {% endif %}
         </div>
         <!--end breadcrumb-->
         <h6 class="mb-0 text-uppercase">Authors Information</h6>
