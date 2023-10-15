@@ -49,6 +49,9 @@
                 </li>
             </ul>
         </li>
+
+        <!-- conditional rendering - only for administrators-->
+        {% if request.user.is_superuser or request.user.is_staff %}
         <li class="menu-label">Accounts</li>
         <li>
             <a href="{% url 'dashboard:administrators' %}">
@@ -57,6 +60,9 @@
                 <div class="menu-title">Administrators</div>
             </a>
         </li>
+        {% endif %}
+
+
     </ul>
     <!--end navigation-->
 </div>
