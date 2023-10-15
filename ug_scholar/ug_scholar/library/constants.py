@@ -2,6 +2,7 @@
 class UG:
     '''UG Constants'''
     
+    # colleges in UG
     colleges = [
             "College of Health Sciences",
             "College of Basic and Applied Sciences",
@@ -9,11 +10,41 @@ class UG:
             "College of Humanities",
         ]
     
+    # schools, institutions and centers in UG
     schools = [
-        "School of Medicine and Dentistry",
-        "School of Veterinary Medicine",
-    ]
-    
+    "Pan-African Doctoral Academy at the University of Ghana",
+    "Institute of Applied Science and Technology",
+    "Institute for Environment and Sanitation Studies",
+    "Biotechnology Research Centre",
+    "Forest and Horticultural Crop Research Centre (FOHCREC)",
+    "Livestock and Poultry Research Centre (LIPREC)",
+    "Soil and Irrigation Research Centre (SIREC)",
+    "West Africa Centre for Crop Improvement",
+    "West African Center for Cell Biology of Infectious Pathogens",
+    "Center for Climate Change and Sustainability Studies(C3SS)",
+    "Noguchi Memorial Institute for Medical Research",
+    "Centre for Tropical, Clinical Pharmacology & Therapeutics",
+    "West African Genetic Medicine Centre (WAGMC)",
+    "Institute of African Studies",
+    "Regional Institute for Population Studies",
+    "Institute for Statistical, Social and Economic Research",
+    "Maria Sibylla Merian Institute for Advanced Studies in Africa",
+    "Centre for Gender Studies and Advocacy",
+    "Centre for Migration Studies",
+    "Centre for Social Policy Studies",
+    "Centre for Urban Management Studies",
+    "Centre for Asian Studies",
+    "Centre for Latin American Studies",
+    "Centre for Ageing Studies",
+    "Centre for European Studies",
+    "Centre for Remote Sensing and Geographical Information Systems",
+    "Language Centre",
+    "Legon Centre for International Affairs and Diplomacy",
+    "Accra City Campus",
+    "Remote Sensing and Geographical Information Systems Labs"
+]
+
+    # Departments in UG
     departments = [
     "Family and Consumer Sciences",
     "Nutrition and Food Science",
