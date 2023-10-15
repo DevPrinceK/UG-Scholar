@@ -11,7 +11,7 @@ urlpatterns = [
 # administrators
 urlpatterns += [
     path('administrators/', views.AdministratorsView.as_view(), name='administrators'),
-    path('create-administrator/', views.CreateUpdateAdministratorView.as_view(), name='create_administrator'),
+    path('create-administrator/', views.CreateUpdateAdministratorView.as_view(), name='create_administrator'), #noqa
 ]
 
 # author and publications
@@ -24,6 +24,9 @@ urlpatterns += [
 # breakdown
 urlpatterns += [
     path('colleges/', views.CollegesView.as_view(), name='colleges'),
-    path('faculties/', views.FacultiesView.as_view(), name='faculties'),
+    path('college-details/', views.CollegeDetailsView.as_view(), name='college_details'),
+    path('institutions-and-centers/', views.FacultiesView.as_view(), name='faculties'),
+    path('institution-details/', views.FacultyDetailsView.as_view(), name='institution_details'),
     path('departments/', views.DepartmentsView.as_view(), name='departments'),
+    path('department-details/', views.DepartmentDetailsView.as_view(), name='department_details'), #noqa
 ]
