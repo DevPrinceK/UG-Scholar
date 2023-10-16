@@ -56,7 +56,7 @@ class UG:
     "Oral Pathology and Medicine",
     "History",
     "Oral Biology",
-    "Health Policy, Planning and Manage",
+    "Health Policy, Planning and Management",
     "Orthodontics and Paedodontics",
     "Information Studies",
     "Pathology",
