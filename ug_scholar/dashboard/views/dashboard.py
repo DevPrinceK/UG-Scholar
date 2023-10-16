@@ -1,12 +1,13 @@
 import json
-from django.shortcuts import render
-from django.views import View
-from django.db.models import Sum, Count
-from django.db.models.functions import Coalesce
-
 from datetime import datetime, timedelta
 
+from django.db.models import Count, Sum
+from django.db.models.functions import Coalesce
+from django.shortcuts import render
+from django.views import View
+
 from api.models import Author, Profile, Publication
+
 
 class IndexView(View):
     '''Renders the dashboard page - Handles all the homepage statistics'''
