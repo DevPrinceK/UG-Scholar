@@ -1,12 +1,12 @@
+import json
+
+from django.db.models import Count, Sum
 from django.shortcuts import render
 from django.views import View
-from django.db.models import Sum, Count
 
 from api.models import Profile
 
-import json
 
-    
 class CollegesView(View):
     '''Renders the colleges page - List of colleges and their statistics'''
     template_name = 'pages/colleges.html'
