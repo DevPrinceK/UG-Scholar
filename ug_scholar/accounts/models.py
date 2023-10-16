@@ -1,6 +1,8 @@
-from django.db import models
-from accounts.manager import AccountManager
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
+from django.db import models
+
+from accounts.manager import AccountManager
+
 
 class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(max_length=100, unique=True)
