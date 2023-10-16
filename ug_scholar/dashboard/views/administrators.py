@@ -1,9 +1,9 @@
-from django.shortcuts import render, redirect
-from django.views import View
 from django.contrib import messages
-from accounts.models import User
+from django.shortcuts import redirect, render
 from django.utils.decorators import method_decorator
+from django.views import View
 
+from accounts.models import User
 from ug_scholar.library.decorators import AdministratorsOnly
 from ug_scholar.library.utils_functions import log_user_action
 
