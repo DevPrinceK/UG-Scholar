@@ -1,12 +1,12 @@
 from django.shortcuts import render
-from django.views import View
-from accounts.models import UserLog
 from django.utils.decorators import method_decorator
+from django.views import View
 
+from accounts.models import UserLog
 from ug_scholar.library.decorators import AdministratorsOnly
 from ug_scholar.library.utils_functions import log_user_action
 
-    
+
 class LogsView(View):
     '''Renders the logs page'''
     template_name = 'pages/logs.html'
