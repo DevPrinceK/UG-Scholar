@@ -104,7 +104,12 @@
 
             <div class="user-box dropdown px-3">
                 <a class="d-flex align-items-center nav-link dropdown-toggle gap-3 dropdown-toggle-nocaret" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    <img src="{% static 'dashboard/assets/images/app/google-scholar.png' %}" class="user-img" alt="user avatar">
+                    
+                    {% if request.user.is_authenticated and request.user.is_superuser or request.user.is_staff %}
+                    <img src="{% if request.user.profile_picture %} {{request.user.profile_picture.url}} {% else %} {% static 'dashboard/assets/images/app/google-scholar.png' %} {% endif %}" class="user-img" alt="user avatar">
+                    {% else %}
+                    <img src="{% static 'dashboard/assets/images/app/google-scholar.png' %}" class="user-img" alt="user profile">
+                    {% endif %}
                     
                     <!-- Do conditional rendering here - only admins -->
                     {% if request.user.is_authenticated and request.user.is_superuser or request.user.is_staff %}
@@ -120,7 +125,9 @@
                 </a>
                 <!-- Do conditional rendering here - only admins -->
                 <ul class="dropdown-menu dropdown-menu-end">
-                    <li><a class="dropdown-item d-flex align-items-center" href="javascript:;"><i class="bx bx-user fs-5"></i><span>Profile</span></a></li>
+                    {% if request.user.is_authenticated and request.user.is_superuser or request.user.is_staff %}
+                    <li><a class="dropdown-item d-flex align-items-center" href="{% url 'dashboard:profile' %}"><i class="bx bx-user fs-5"></i><span>Profile</span></a></li>
+                    {% endif %}
                     {% if request.user.is_authenticated and request.user.is_superuser or request.user.is_staff %}
                     <li><a class="dropdown-item d-flex align-items-center" href="{% url 'accounts:logout' %}"><i class="bx bx-log-out-circle"></i><span>Logout</span></a></li>
                     {% else %}
