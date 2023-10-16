@@ -58,7 +58,12 @@
                             {% for author in authors %}
                             <tr>
                                 <td> <img src=" {% if author.thumbnail %} {{author.thumbnail}} {% else %} https://scholar.google.com/citations/images/avatar_scholar_128.png {% endif %} " style="height: 60px; width:auto;"></td> 
-                                <td>{{author.name}} <br> <small style="color: lightblue;">{{author.college}}</small> </td> 
+                                
+                                <td>
+                                    <a href="https://scholar.google.com/citations?hl=en&user={{author.scholar_id}}" target="_blank">
+                                    {{author.name}} <br> <small style="color: lightblue;">{{author.college}}</small> 
+                                </a>
+                                </td> 
                                 <td>{{author.rank}}</td> 
                                 <td>{{author.get_author_publications}}</td>
                                 <td>{{author.get_author_citations}}</td>
