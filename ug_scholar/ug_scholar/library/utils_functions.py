@@ -1,8 +1,9 @@
-from serpapi import GoogleSearch
-from urllib.parse import urlsplit, parse_qsl
-import pandas as pd
 import json
 import re
+from urllib.parse import parse_qsl, urlsplit
+
+import pandas as pd
+from serpapi import GoogleSearch
 
 from accounts.models import UserLog
 
