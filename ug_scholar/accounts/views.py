@@ -1,10 +1,11 @@
-from django.shortcuts import redirect
-from django.views import View
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
+from django.shortcuts import redirect
+from django.views import View
 
 from ug_scholar.library.utils_functions import log_user_action
-    
+
+
 class LoginView(View):
     '''Login view - /login/'''
     
