@@ -9,6 +9,10 @@ from api.models import Author, Profile
 from dashboard.forms import AuthorProfileForm
 from ug_scholar.library.constants import UG
 
+from django.utils.decorators import method_decorator
+
+from ug_scholar.library.decorators import AdministratorsOnly
+
     
 class AuthorsView(View):
     '''Renders the authors profiles page - profiles page'''
@@ -42,6 +46,7 @@ class CreateUpdateAuthorView(View):
     def get(self, request):
         return redirect('dashboard:authors')    
     
+    @method_decorator(AdministratorsOnly)
     def post(self, request):
         scholar_id = request.POST.get('scholar_id')
         profile = Profile.objects.filter(scholar_id=scholar_id).first()
@@ -62,15 +67,3 @@ class CreateUpdateAuthorView(View):
                 message = f"{field.title()}: {strip_tags(error)}"
                 messages.info(request, message)
                 return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
-
-
-class CreateUpdateAdministratorView(View):
-    '''Renders the administrators page'''
-    template_name = 'pages/administrators.html'
-    
-    def get(self, request):
-        administrators = User.objects.all()
-        context = {
-            'administrators': administrators
-        }
-        return render(request, self.template_name, context)
