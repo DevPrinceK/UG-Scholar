@@ -54,11 +54,14 @@ class CollegeDetailsView(View):
         total_h_index = 0
         total_i_index = 0
         total_authors = authors.count()
+        publishing_authors = authors.filter(author__publications__isnull=False).distinct().count() #noqa
         total_pubs = 0
+        total_citations = 0
         for author in authors:
             total_h_index += author.get_author_hindex()
             total_i_index += author.get_author_i10index()
             total_pubs += author.get_author_publications()
+            total_citations += author.get_author_citations() if author.get_author_citations() else 0
         # compute the college indexes
         college_indexes = [
             {
@@ -87,6 +90,12 @@ class CollegeDetailsView(View):
             "authors": authors,
             "college_indexes_json": json.dumps(college_indexes),
             "college_auth_pub_json": json.dumps(college_auth_pub),
+            "college_h_index": total_h_index,
+            "college_i_index": total_i_index,
+            "college_total_authors": total_authors,
+            "college_total_publications": total_pubs,
+            "college_total_citations": total_citations,
+            "college_publishing_authors": publishing_authors,
         }
         return render(request, self.template_name, context)
         
@@ -101,12 +110,15 @@ class DepartmentDetailsView(View):
         authors = Profile.objects.filter(department=department_name.strip())
         total_h_index = 0
         total_i_index = 0
+        total_citations = 0
         total_authors = authors.count()
+        publishing_authors = authors.filter(author__publications__isnull=False).distinct().count() #noqa
         total_pubs = 0
         for author in authors:
             total_h_index += author.get_author_hindex()
             total_i_index += author.get_author_i10index()
             total_pubs += author.get_author_publications()
+            total_citations += author.get_author_citations() if author.get_author_citations() else 0
         # compute the department indexes
         department_indexes = [
             {
@@ -139,6 +151,8 @@ class DepartmentDetailsView(View):
             "department_i_index": total_i_index,
             "department_total_authors": total_authors,
             "department_total_publications": total_pubs,
+            "department_total_citations": total_citations,
+            "department_publishing_authors": publishing_authors,
         }
         return render(request, self.template_name, context)
         
@@ -185,12 +199,15 @@ class FacultyDetailsView(View):
         authors = Profile.objects.filter(school=institution_name.strip())
         total_h_index = 0
         total_i_index = 0
+        total_citations = 0
         total_authors = authors.count()
+        publishing_authors = authors.filter(author__publications__isnull=False).distinct().count() #noqa
         total_pubs = 0
         for author in authors:
             total_h_index += author.get_author_hindex()
             total_i_index += author.get_author_i10index()
             total_pubs += author.get_author_publications()
+            total_citations += author.get_author_citations() if author.get_author_citations() else 0
         # compute the institution indexes
         institution_indexes = [
             {
@@ -223,6 +240,8 @@ class FacultyDetailsView(View):
             "institution_i_index": total_i_index,
             "institution_total_authors": total_authors,
             "institution_total_publications": total_pubs,
+            "institution_total_citations": total_citations,
+            "institution_publishing_authors": publishing_authors,
         }
         return render(request, self.template_name, context)
         
