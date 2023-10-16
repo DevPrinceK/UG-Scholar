@@ -18,35 +18,48 @@
             </div>
         </div>
         <!--end breadcrumb-->
-        <!-- colleges charts section -->
-        <div class="row">
-            <div class="col-12 col-lg-6">
-                <div class="card radius-10">
-                    <div class="card-body">
-                      <div class="p-3">
-                        <p>H-INDEX</p>
-                        <h4 class="mb-0 mt-0">{{department_h_index}}</h4>
-                        <hr>
-                        <p>I-INDEX</p>
-                        <h4 class="mb-0 mt-0">{{department_i_index}}</h4>
-                      </div>
-                    </div>
+       <!-- departments charts section -->
+       <div class="row">
+        <div class="col-12 col-lg-4">
+            <div class="card radius-10">
+                <div class="card-body">
+                  <div class="p-3">
+                    <p>H-INDEX</p>
+                    <h4 class="mb-0 mt-0">{{department_h_index}}</h4>
+                    <hr>
+                    <p>I-INDEX</p>
+                    <h4 class="mb-0 mt-0">{{department_i_index}}</h4>
+                  </div>
                 </div>
             </div>
-            <div class="col-12 col-lg-6">
-              <div class="card radius-10">
-                  <div class="card-body">
-                    <div class="p-3">
-                        <p>Total Authors</p>
-                        <h4 class="mb-0 mt-0">{{department_total_authors}}</h4>
-                        <hr>
-                        <p>Total Publications</p>
-                        <h4 class="mb-0 mt-0">{{department_total_publications}}</h4>
-                      </div>
-                    </div>
-              </div>
+        </div>
+        <div class="col-12 col-lg-4">
+          <div class="card radius-10">
+              <div class="card-body">
+                <div class="p-3">
+                    <p>Total Authors</p>
+                    <h4 class="mb-0 mt-0">{{department_total_authors|intcomma}}</h4>
+                    <hr>
+                    <p>Publishing Authors</p>
+                    <h4 class="mb-0 mt-0">{{department_publishing_authors|intcomma}}</h4>
+                  </div>
+                </div>
           </div>
-        </div><!--end row-->
+      </div>
+        <div class="col-12 col-lg-4">
+          <div class="card radius-10">
+              <div class="card-body">
+                <div class="p-3">
+                    <p>Total Publications</p>
+                    <h4 class="mb-0 mt-0">{{department_total_publications|intcomma}}</h4>
+                    <hr>
+                    <p>Total Citations</p>
+                    <h4 class="mb-0 mt-0">{{department_total_citations|intcomma}}</h4>
+                  </div>
+                </div>
+          </div>
+      </div>
+    </div><!--end row-->
         <!-- colleges charts section -->
         <div class="row">
             <div class="col-12 col-lg-6">
@@ -86,7 +99,11 @@
                                     {% for info in authors %}
                                     <tr>
                                         <td> <img src=" {% if info.thumbnail %} {{info.thumbnail}} {% else %} https://scholar.google.com/citations/images/avatar_scholar_128.png {% endif %} " style="height: 60px; width:auto;"></td>
-                                        <td>{{info.name }} <br/><small class="text-info">{{info.rank}}</small> </td>
+                                        <td>
+                                            <a href="https://scholar.google.com/citations?hl=en&user={{info.scholar_id}}" target="_blank">
+                                            {{info.name}} <br> <small class="text-info">{{info.rank}}</small> 
+                                            </a>
+                                        </td> 
                                         <td>{{info.get_author_publications|intcomma }}</td>
                                         <td>{{info.get_author_citations|intcomma }}</td>
                                         <td>{{info.get_author_hindex|intcomma }}</td>
