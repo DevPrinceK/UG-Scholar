@@ -4,6 +4,8 @@ import pandas as pd
 import json
 import re
 
+from accounts.models import UserLog
+
 
 def get_author_ids() -> list:
     '''extracts all author IDs and relevant data from the CSV and returns them as a list'''
@@ -105,3 +107,10 @@ def scrape_author_data(author_id: str = "Tpwr9vwAAAAJ") -> dict:
     print(f"Done. Extracted {len(author_results_data['author_articles'])-1} articles.") #noqa
     
     return author_results_data
+
+
+
+def log_user_action(user, action):
+    '''logs user actions'''
+    UserLog.objects.create(user=user, action=action)
+    return True
