@@ -1,19 +1,17 @@
-from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.views import View
 from django.contrib import messages
-from django.utils.html import strip_tags
 from accounts.models import User
+from django.utils.decorators import method_decorator
 
-from api.models import Author, Profile
-from dashboard.forms import AuthorProfileForm
-from ug_scholar.library.constants import UG
+from ug_scholar.library.decorators import AdministratorsOnly
 
 
 class AdministratorsView(View):
     '''Renders the administrators page'''
     template_name = 'pages/administrators.html'
     
+    @method_decorator(AdministratorsOnly)
     def get(self, request):
         administrators = User.objects.all()
         context = {
@@ -25,9 +23,11 @@ class AdministratorsView(View):
 class CreateUpdateAdministratorView(View):
     '''Renders the create/update administrators page'''
     
+    @method_decorator(AdministratorsOnly)
     def get(self, request):
         return redirect('dashboard:administrators')    
     
+    @method_decorator(AdministratorsOnly)
     def post(self, request):
         email = request.POST.get('email')
         password = request.POST.get('password')
