@@ -1,10 +1,12 @@
 import json
+
 from rest_framework import permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from api.models import Author, Profile, Publication
 
-from ug_scholar.library.utils_functions import get_author_ids, scrape_author_data
+from api.models import Author, Profile, Publication
+from ug_scholar.library.utils_functions import (get_author_ids,
+                                                scrape_author_data)
 
 
 class OverviewAPI(APIView):
