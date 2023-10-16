@@ -12,6 +12,7 @@ from ug_scholar.library.constants import UG
 from django.utils.decorators import method_decorator
 
 from ug_scholar.library.decorators import AdministratorsOnly
+from ug_scholar.library.utils_functions import log_user_action
 
     
 class AuthorsView(View):
@@ -22,15 +23,10 @@ class AuthorsView(View):
         ug = UG()
         authors = Profile.objects.all()
         
-        
         schools = ug.get_schools()
         departments = ug.get_departments()
         colleges = ug.get_colleges()
-        
-        print("Priting Colleges")
-        print(colleges)
-        
-        
+      
         context = {
             'authors': authors,
             'colleges': colleges,
@@ -44,26 +40,30 @@ class CreateUpdateAuthorView(View):
     '''Renders the create/update author page'''
     
     def get(self, request):
+        user = request.user
+        log_user_action(user, "Tried to access author form using get request")
         return redirect('dashboard:authors')    
     
     @method_decorator(AdministratorsOnly)
     def post(self, request):
+        user = request.user
         scholar_id = request.POST.get('scholar_id')
         profile = Profile.objects.filter(scholar_id=scholar_id).first()
         if profile is not None:
+            log_user_action(user, "Tried to create author profile with an already existing scholar id")
             messages.info(request, "Author Profile Already Exists")
             return redirect('dashboard:authors')
-        print("Now Printing Scholar ID")
-        print(scholar_id)
         form = AuthorProfileForm(request.POST)
         if form.is_valid():
             profile = form.save()
             author = Author.objects.create(profile=profile)
             author.save()
+            log_user_action(user, f"Created author profile: {profile.name} successfully")
             messages.success(request, "Author Profile Created Successfully")
             return redirect('dashboard:authors')
         else:
             for field, error in form.errors.items():
                 message = f"{field.title()}: {strip_tags(error)}"
+                log_user_action(user, f"Tried to create author profile but error occured: {message}")
                 messages.info(request, message)
                 return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
