@@ -2,7 +2,8 @@ from django.shortcuts import render
 from django.views import View
 
 from api.models import Publication
-    
+
+
 class PublicationsView(View):
     template_name = 'pages/publications.html'
     
