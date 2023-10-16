@@ -36,3 +36,8 @@ urlpatterns += [
     path('profile/', views.ProfileView.as_view(), name='profile'),
     path('change-profile-picture/', views.ChangeProfilePictureView.as_view(), name='change_pp'), #noqa
 ]
+
+# logs
+urlpatterns += [
+    path('logs/', views.LogsView.as_view(), name='logs'),
+]
