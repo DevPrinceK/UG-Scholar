@@ -30,3 +30,9 @@ urlpatterns += [
     path('departments/', views.DepartmentsView.as_view(), name='departments'),
     path('department-details/', views.DepartmentDetailsView.as_view(), name='department_details'), #noqa
 ]
+
+# profile
+urlpatterns += [
+    path('profile/', views.ProfileView.as_view(), name='profile'),
+    path('change-profile-picture/', views.ChangeProfilePictureView.as_view(), name='change_pp'), #noqa
+]
