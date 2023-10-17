@@ -5,7 +5,6 @@ from django.utils.decorators import method_decorator
 from django.utils.html import strip_tags
 from django.views import View
 
-from accounts.models import User
 from api.models import Author, Profile
 from dashboard.forms import AuthorProfileForm
 from ug_scholar.library.constants import UG
