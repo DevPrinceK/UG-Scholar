@@ -127,8 +127,6 @@ class IndexView(View):
             department['authors_with_publications'] = authors_with_publications
             department['total_h_index'] = total_h_index
             department['total_i10_index'] = total_i10_index
-        
-        print(department_breakdown_info)
 
         # Query to get the total publications and citations for each of the last three years
         three_years_performance = Publication.objects.filter(
