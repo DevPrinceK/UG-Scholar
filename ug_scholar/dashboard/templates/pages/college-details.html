@@ -71,8 +71,40 @@
             </div>
             <div class="col-12 col-lg-6">
               <div class="card radius-10">
+                <div class="card-header">
+                    <h5 class="mb-0">College Departments</h5>
+                </div>
                   <div class="card-body">
+                    {% comment %}
                       <div id="authorNPubChart" data-performance="{{college_auth_pub_json}}"></div>
+                    {% endcomment %}
+                    <div class="table-responsive" style="height: 325px; overflow-y: scroll;">
+                        <table id="example" class="table table-striped table-bordered" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th>Department</th>
+                                    <th>Authors</th>
+                                    <th>Publications</th>
+                                    <th>CITATIONS</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if filtered_departments %}
+                                        {% for department in filtered_departments %}
+                                            <td><span data-bs-toggle="tooltip" data-bs-placement="top" title="{{department.name}}">{{department.abbr }}</span> </td>
+                                            <td>{{department.total_authors }} ({{department.authors_with_publications}}) </td>
+                                            <td>{{department.total_publications|intcomma }}</td>
+                                            <td>{{department.total_citations|intcomma }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                        {% else %}
+                                        <tr>
+                                            <td colspan="6" class="text-center">No Info Available</td>
+                                        </tr>
+                                        {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
                     </div>
               </div>
           </div>
