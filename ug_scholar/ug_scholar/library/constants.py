@@ -2,6 +2,19 @@
 class UG:
     '''UG Constants'''
     
+    # Faculties ranks in UG
+    ranks = [
+        "ASSISTANT LECTURER",
+        "LECTURER",
+        "SENIOR LECTURER",
+        "FELLOW",
+        "SENIOR RESEARCH FELLOW",
+        "ASSOCIATE PROFESSOR",
+        "PROFESSOR",
+        "PROFESSOR EMERITUS",
+        "PROFESSOR EMERITA"
+    ]
+    
     # colleges in UG
     colleges = [
             "College of Health Sciences",
@@ -154,3 +167,6 @@ class UG:
     
     def get_schools(self):
         return self.schools
+    
+    def get_ranks(self):
+        return self.ranks
