@@ -96,7 +96,7 @@ $(function () {
             }
         },
         xAxis: {
-            type: 'Colleges'
+            type: 'category'
         },
         yAxis: {
             title: {
