@@ -88,6 +88,42 @@ class Profile(models.Model):
         publications = author.publications.all()
         citations = publications.aggregate(models.Sum('citations'))['citations__sum'] #noqa
         return citations
+    
+    def abbreviate_college(self) -> str:
+        '''Abbreviates the name of the college'''
+        if self.name:
+            college_names = self.college.split()
+            if len(college_names) > 1:
+                initials = [name[0] for name in college_names[:-1]]
+                return initials.upper()
+            else:
+                return college_names[0].upper()
+        else:
+            return self.scholar_id
+        
+    def abbreviate_school(self) -> str:
+        '''Abbreviates the name of the school'''
+        if self.name:
+            school_names = self.school.split()
+            if len(school_names) > 1:
+                initials = [name[0] for name in school_names[:-1]]
+                return initials.upper()
+            else:
+                return school_names[0].upper()
+        else:
+            return self.scholar_id
+        
+    def abbreviate_department(self) -> str:
+        '''Abbreviates the name of the department'''
+        if self.name:
+            department_names = self.department.split()
+            if len(department_names) > 1:
+                initials = "".join([name[0] for name in department_names])
+                return initials.upper()
+            else:
+                return department_names[0][0].upper() + department_names[-1][0].upper()
+        else:
+            return self.scholar_id
         
         
     def __str__(self):
