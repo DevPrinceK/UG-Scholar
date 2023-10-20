@@ -85,6 +85,31 @@ class CollegeDetailsView(View):
             }
         ]
         
+         # Query to get unique departments in the specified college along with their information
+        filtered_departments = Profile.objects.filter(college=college_name).values('department').annotate(
+            total_authors=Count('id'),
+            authors_with_publications=Count('author__publications', distinct=True),
+            total_publications=Count('author__publications'),
+            total_citations=Sum('author__publications__citations'),
+        ).order_by('department')
+        
+        # convert to list to make it serializable
+        filtered_departments = list(filtered_departments)
+
+        # Calculate total_h_index and total_i10_index for each department
+        for department in filtered_departments:
+            authors = Profile.objects.filter(department=department['department'])
+            total_authors = authors.count()
+            authors_with_publications = authors.filter(author__publications__isnull=False).distinct().count()
+            total_h_index = sum(author.get_author_hindex() for author in authors)
+            total_i10_index = sum(author.get_author_i10index() for author in authors)
+
+            department['total_authors'] = total_authors
+            department['authors_with_publications'] = authors_with_publications
+            department['total_h_index'] = total_h_index
+            department['total_i10_index'] = total_i10_index
+            department['abbr'] = authors[0].abbreviate_department()
+        
         context = {
             "college_name": college_name,
             "authors": authors,
@@ -96,6 +121,7 @@ class CollegeDetailsView(View):
             "college_total_publications": total_pubs,
             "college_total_citations": total_citations,
             "college_publishing_authors": publishing_authors,
+            "filtered_departments": filtered_departments,
         }
         return render(request, self.template_name, context)
         
@@ -231,6 +257,32 @@ class FacultyDetailsView(View):
             }
         ]
         
+        # Query to get unique departments in the specified college along with their information
+        filtered_departments = Profile.objects.filter(school=institution_name).values('department').annotate(
+            total_authors=Count('id'),
+            authors_with_publications=Count('author__publications', distinct=True),
+            total_publications=Count('author__publications'),
+            total_citations=Sum('author__publications__citations'),
+        ).order_by('department')
+        
+        # convert to list to make it serializable
+        filtered_departments = list(filtered_departments)
+
+        # Calculate total_h_index and total_i10_index for each department
+        for department in filtered_departments:
+            authors = Profile.objects.filter(department=department['department'])
+            total_authors = authors.count()
+            authors_with_publications = authors.filter(author__publications__isnull=False).distinct().count()
+            total_h_index = sum(author.get_author_hindex() for author in authors)
+            total_i10_index = sum(author.get_author_i10index() for author in authors)
+
+            department['total_authors'] = total_authors
+            department['authors_with_publications'] = authors_with_publications
+            department['total_h_index'] = total_h_index
+            department['total_i10_index'] = total_i10_index
+            department['abbr'] = authors[0].abbreviate_department()
+
+       
         context = {
             "institution_name": institution_name,
             "authors": authors,
@@ -242,12 +294,12 @@ class FacultyDetailsView(View):
             "institution_total_publications": total_pubs,
             "institution_total_citations": total_citations,
             "institution_publishing_authors": publishing_authors,
+            "filtered_departments": filtered_departments,
         }
         return render(request, self.template_name, context)
         
 
   
-    
 class DepartmentsView(View):
     '''Renders the departments page - List of departments and their statistics'''
     template_name = 'pages/departments.html'
@@ -281,3 +333,36 @@ class DepartmentsView(View):
         }
         return render(request, self.template_name, context)
   
+
+# !!!!!!!!!!!!!!!!!!
+class DepartmentsInCollegeView(View):
+    '''Renders the departments page for a specific college - List of departments and their statistics'''
+    template_name = 'pages/departments_in_college.html'  # Update with your template name
+    
+    def get(self, request, college):
+        # Query to get unique departments in the specified college along with their information
+        department_breakdown_info = Profile.objects.filter(college=college).values('department').annotate(
+            total_authors=Count('id'),
+            authors_with_publications=Count('author__publications', distinct=True),
+            total_publications=Count('author__publications'),
+            total_citations=Sum('author__publications__citations'),
+        ).order_by('department')
+
+        # Calculate total_h_index and total_i10_index for each department
+        for department in department_breakdown_info:
+            authors = Profile.objects.filter(department=department['department'])
+            total_authors = authors.count()
+            authors_with_publications = authors.filter(author__publications__isnull=False).distinct().count()
+            total_h_index = sum(author.get_author_hindex() for author in authors)
+            total_i10_index = sum(author.get_author_i10index() for author in authors)
+
+            department['total_authors'] = total_authors
+            department['authors_with_publications'] = authors_with_publications
+            department['total_h_index'] = total_h_index
+            department['total_i10_index'] = total_i10_index
+
+        context = {
+            'college': college,
+            'department_breakdown_info': department_breakdown_info,
+        }
+        return render(request, self.template_name, context)
