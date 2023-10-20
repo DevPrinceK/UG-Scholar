@@ -10,8 +10,6 @@ from accounts.models import UserLog
 
 def get_author_ids() -> list:
     '''extracts all author IDs and relevant data from the CSV and returns them as a list'''
-    # df = pd.read_csv("ug-data.csv")
-    # df = pd.read_csv("ug_scholar\library\sample.csv")
     df = pd.read_csv("ug_scholar\library\one-100.csv")
     scholar_info = df[['scholar', 'email', "college", 'school', 'department', 'rank']] #noqa
     scholar_info_dict = scholar_info.to_dict(orient="records")
