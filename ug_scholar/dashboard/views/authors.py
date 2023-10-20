@@ -23,12 +23,14 @@ class AuthorsView(View):
         schools = ug.get_schools()
         departments = ug.get_departments()
         colleges = ug.get_colleges()
+        ranks = ug.get_ranks()
       
         context = {
             'authors': authors,
             'colleges': colleges,
             'schools': schools,
             'departments': departments,
+            'ranks': ranks,
         }
         return render(request, self.template_name, context)
     
