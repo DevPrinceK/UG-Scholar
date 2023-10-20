@@ -25,7 +25,7 @@ $(function() {
             type: 'pie'
         },
         title: {
-            text: 'Department Indexes Statistics'
+            text: 'Institute/Center Indexes Statistics'
         },
         tooltip: {
             pointFormat: '{series.name}: <p>{point.percentage:.1f}%</p>'
@@ -76,7 +76,7 @@ $(function() {
             type: 'pie'
         },
         title: {
-            text: 'Department Authors and Publications'
+            text: 'Institute/Center Authors and Publications'
         },
         tooltip: {
             pointFormat: '{series.name}: <p>{point.percentage:.1f}%</p>'
