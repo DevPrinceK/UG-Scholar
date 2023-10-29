@@ -30,7 +30,8 @@
             {% if request.user.is_superuser or request.user.staff %}
             <div class="ms-auto">
                 <div class="btn-group">
-                    <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#authorForm">New Author</button>
+                    <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#authorForm">Add Author</button>
+                    <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#bulkAuthor">Bulk Author Upload</button>
                 </div>
             </div>
             {% endif %}
@@ -101,7 +102,7 @@
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable"" >
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="authorFormLabel">Create Author</h5>
+          <h5 class="modal-title" id="authorFormLabel">Create Single Author</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
@@ -165,6 +166,37 @@
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     <button type="submit" class="btn btn-primary">Save Author</button>
                   </div>
+            </form>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+
+<!-- Authors from CSV-->
+<div class="modal fade" id="bulkAuthor" tabindex="-1" aria-labelledby="bulkAuthorLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable"" >
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="bulkAuthorLabel">Upload Authors CSV File</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <form action="{% url 'dashboard:create_author' %}" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="form-group mb-2">
+                    <label for="name">Authos File</label>
+                    <input type="file" accept=".csv" name="csv_file" class="form-control">
+                </div>
+                <div class="form-group mb-2">
+                    <label for="name">Sample File Format</label>
+                    <small class="text-info"><a href="">Download Sample File Format</a></small>
+                </div>
+                
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Upload Authors</button>
+                </div>
             </form>
         </div>
         
