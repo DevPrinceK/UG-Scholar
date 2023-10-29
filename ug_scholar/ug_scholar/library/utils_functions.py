@@ -8,9 +8,12 @@ from serpapi import GoogleSearch
 from accounts.models import UserLog
 
 
-def get_author_ids() -> list:
+def get_author_ids(csv_file=None) -> list:
     '''extracts all author IDs and relevant data from the CSV and returns them as a list'''
-    df = pd.read_csv("ug_scholar\library\one-100.csv")
+    if csv_file == None:
+        df = pd.read_csv("ug_scholar\library\one-100.csv")
+    else:
+        df = pd.read_csv(csv_file)
     scholar_info = df[['scholar', 'email', "college", 'school', 'department', 'rank']] #noqa
     scholar_info_dict = scholar_info.to_dict(orient="records")
     author_relevant_info = []
@@ -43,8 +46,9 @@ def scrape_author_data(author_id: str = "Tpwr9vwAAAAJ") -> dict:
     TAWIAH = "ded3dabcba3e4aee20e120d9b923f19e70c7a11aa4d0740ea712e737cc1e904f" #noqa
     STIGAR = "4f940edc13eccb5c0f58327859400c2daab057d5fb1aadfdd4cc1ad9d28cbf89" #noqa
     ERNEST = "7c6cd4ed1b4a2a61f435b25f44bda533e9814853ca5e53ca29f5940088354673" #noqa
+    STEPH = "811d5d3af6e8f0ec4faaa72b09d57e2c3aa85d96aa4141aa720fcffa4e224746" #noqa
     params = {
-        "api_key": MINE,
+        "api_key": STEPH,
         "engine": "google_scholar_author",
         "hl": "en",
         "author_id": author_id  # "Tpwr9vwAAAAJ" - default
