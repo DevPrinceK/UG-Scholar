@@ -91,7 +91,7 @@
                             <tbody>
                                 {% if filtered_departments %}
                                         {% for department in filtered_departments %}
-                                            <td><span data-bs-toggle="tooltip" data-bs-placement="top" title="{{department.name}}">{{department.abbr }}</span> </td>
+                                            <td><span data-bs-toggle="tooltip" data-bs-placement="top" title="{{department.department}}">{{department.abbr }}</span> </td>
                                             <td>{{department.total_authors }} ({{department.authors_with_publications}}) </td>
                                             <td>{{department.total_publications|intcomma }}</td>
                                             <td>{{department.total_citations|intcomma }}</td>
