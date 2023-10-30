@@ -182,15 +182,15 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-            <form action="{% url 'dashboard:create_author' %}" method="POST" enctype="multipart/form-data">
+            <form action="{% url 'dashboard:bulk_upload_authors' %}" method="POST" enctype="multipart/form-data">
                 {% csrf_token %}
                 <div class="form-group mb-2">
-                    <label for="name">Authos File</label>
+                    <label for="name">Authors File</label>
                     <input type="file" accept=".csv" name="csv_file" class="form-control">
                 </div>
                 <div class="form-group mb-2">
                     <label for="name">Sample File Format</label>
-                    <small class="text-info"><a href="{% url 'dashboard:download_aut_csv' %}" target="_blank">Download Sample File Format</a></small>
+                    <small class="text-info"><a href="{% url 'dashboard:download_aut_csv' %}" class="text-primary" target="_blank">Download Sample File Format</a></small>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
