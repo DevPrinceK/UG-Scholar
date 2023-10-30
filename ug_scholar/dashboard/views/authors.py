@@ -9,7 +9,7 @@ from django.utils.decorators import method_decorator
 from django.utils.html import strip_tags
 from django.views import View
 
-from api.models import Author, Profile
+from api.models import Author, Profile, Publication
 from dashboard.forms import AuthorProfileForm
 from dashboard.views import publications
 from dashboard.views.publications import PublicationsView
@@ -126,7 +126,7 @@ class BulkUploadAuthorView(View):
 
             # create publications
             for article in author_articles:
-                publication = PublicationsView.objects.filter(citation_id=article['article_citation_id']).first()  # noqa
+                publication = Publication.objects.filter(citation_id=article['article_citation_id']).first()  # noqa
                 # Handle null citation values
                 citation_value = article['article_cited_by_value']
                 article_year = article['article_year']
@@ -143,7 +143,7 @@ class BulkUploadAuthorView(View):
 
                 if publication is None:
                     # create new publication
-                    publication = publications.objects.create(
+                    publication = Publication.objects.create(
                         title=article['article_title'],
                         year=article_year,
                         link=article['article_link'],
