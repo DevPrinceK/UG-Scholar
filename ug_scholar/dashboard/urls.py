@@ -21,6 +21,7 @@ urlpatterns += [
     path('create-author/', views.CreateUpdateAuthorView.as_view(), name='create_author'),
     path('publications/', views.PublicationsView.as_view(), name='publications'),
     path('download-sample-file/', views.DownloadSampleBulkFileView.as_view(), name='download_aut_csv'), #noqa
+    path('bulk-upload-authors/', views.BulkUploadAuthorView.as_view(), name='bulk_upload_authors'), #noqa
 ]
 
 # breakdown
