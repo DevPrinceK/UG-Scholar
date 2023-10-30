@@ -106,7 +106,6 @@ def scrape_author_data(author_id: str = "Tpwr9vwAAAAJ") -> dict:
             break
 
     print(json.dumps(author_results_data, indent=2, ensure_ascii=False))
-    # counts extra empty line, that's why -1.
     print(f"Done. Extracted {len(author_results_data['author_articles'])-1} articles.") #noqa
     
     return author_results_data
