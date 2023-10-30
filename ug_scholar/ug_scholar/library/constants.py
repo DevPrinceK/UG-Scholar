@@ -1,4 +1,29 @@
 
+class SampleAuthorData:
+    '''Sample Author Data'''
+    # ['scholar', 'email', "college", 'school', 'department', 'rank']
+    author_data = [
+        {
+            "scholar": "https://scholar.google.com/citations?user=Tpwr9vwAAAAJ&hl=en&oi=ao",
+            "email": "ksadu-manu@ug.edu.gh",
+            "college": "College of Basic and Applied Sciences",
+            "school": "School of Physical and Mathematical Sciences",
+            "department": "Computer Science",
+            "rank": "Senior Lecturer"
+        },
+        {
+            "scholar": "https://scholar.google.com.au/citations?user=-q7bsWUAAAAJ&hl=en",
+            "email": "revgyampo@ug.edu.gh",
+            "college": "College of Humanities",
+            "school": "School of Social Sciences",
+            "department": "Political Science",
+            "rank": "Professor"
+        },
+    ]
+    
+    def get_author_sample_data(self):
+        return self.author_data
+
 class UG:
     '''UG Constants'''
     
