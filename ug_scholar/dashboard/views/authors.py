@@ -1,6 +1,9 @@
+import csv
+import os
 import json
 from django.contrib import messages
 from django.http import HttpResponseRedirect
+from django.http.response import HttpResponse
 from django.shortcuts import redirect, render
 from django.utils.decorators import method_decorator
 from django.utils.html import strip_tags
@@ -10,7 +13,7 @@ from api.models import Author, Profile
 from dashboard.forms import AuthorProfileForm
 from dashboard.views import publications
 from dashboard.views.publications import PublicationsView
-from ug_scholar.library.constants import UG
+from ug_scholar.library.constants import UG, SampleAuthorData
 from ug_scholar.library.decorators import AdministratorsOnly
 from ug_scholar.library.utils_functions import get_author_ids, log_user_action, scrape_author_data
 
@@ -79,7 +82,7 @@ class BulkUploadAuthorView(View):
 
     def get(self, request):
         user = request.user
-        log_user_action(user, "Tried to access bulk upload author form using get request") # noqa
+        log_user_action(user, "Tried to access bulk upload author form using get request")  # noqa
         return redirect('dashboard:authors')
 
     def post(self, request):
@@ -172,6 +175,23 @@ class BulkUploadAuthorView(View):
                 # update the count of updated publications and authors
                 updated_publications += 1
             updated_authors += 1
-        messages.success(request, f"Updated {updated_authors} authors with {updated_publications} publications") # noqa
-        log_user_action(request.user, "Updated the system using bulk author upload successfully") # noqa
+        messages.success(request, f"Updated {updated_authors} authors with {updated_publications} publications")  # noqa
+        log_user_action(request.user, "Updated the system using bulk author upload successfully")  # noqa
         return redirect('dashboard:authors')
+
+
+class DownloadSampleBulkFileView(View):
+    '''Used to download a sample csv file for bulk upload'''
+
+    def get(self, request):
+        sample_data = SampleAuthorData().get_author_sample_data()
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="bulk_author_upload_sample.csv"'
+
+        writer = csv.writer(response)
+        writer.writerow(['scholar', 'email', "college", 'school', 'department', 'rank']) # noqa
+        
+        for data in sample_data:
+            writer.writerow([data['scholar'], data['email'], data['college'], data['school'], data['department'], data['rank']])
+            
+        return response
