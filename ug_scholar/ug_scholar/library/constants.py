@@ -12,6 +12,22 @@ class SampleAuthorData:
             "rank": "Senior Lecturer"
         },
         {
+            "scholar": "https://scholar.google.com/citations?hl=en&user=bSzu19wAAAAJ",
+            "email": "wyaokumah@ug.edu.gh",
+            "college": "College of Basic and Applied Sciences",
+            "school": "School of Physical and Mathematical Sciences",
+            "department": "Computer Science",
+            "rank": "Professor"
+        },
+        {
+            "scholar": "https://scholar.google.com/citations?hl=en&user=jgx_JBYAAAAJ",
+            "email": "edansong@ug.edu.gh",
+            "college": "College of Basic and Applied Sciences",
+            "school": "School of Physical and Mathematical Sciences",
+            "department": "Computer Science",
+            "rank": "Senior Lecturer"
+        },
+        {
             "scholar": "https://scholar.google.com.au/citations?user=-q7bsWUAAAAJ&hl=en",
             "email": "revgyampo@ug.edu.gh",
             "college": "College of Humanities",
