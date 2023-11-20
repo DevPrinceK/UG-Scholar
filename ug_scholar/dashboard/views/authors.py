@@ -55,24 +55,36 @@ class CreateUpdateAuthorView(View):
         scholar_id = request.POST.get('scholar_id')
         profile = Profile.objects.filter(scholar_id=scholar_id).first()
         if profile is not None:
-            log_user_action(
-                user, "Tried to create author profile with an already existing scholar id")
+            log_user_action(user, "Tried to create author profile with an already existing scholar id") #noqa
             messages.info(request, "Author Profile Already Exists")
             return redirect('dashboard:authors')
+        # author does not exist, create new author profile
+        print(f"Scrapping author data for profile: {scholar_id}")
+        try:
+            scraped = scrape_author_data(scholar_id)
+        except Exception as e:
+            messages.info(request, f"Error occured: {e}")
+            return redirect('dashboard:authors')
+        author_data = scraped["author_data"]
         form = AuthorProfileForm(request.POST)
         if form.is_valid():
-            profile = form.save()
+            profile = form.save(commit=False)
+            if author_data is not None or author_data != {}:
+                profile.name = author_data['name']
+                profile.affiliation = author_data['affiliations']
+                profile.thumbnail = author_data['thumbnail']
+                profile.interests = json.dumps(author_data['interests'])
+                profile.statistics = json.dumps(author_data['cited_by_table'])
+            profile.save()
             author = Author.objects.create(profile=profile)
             author.save()
-            log_user_action(
-                user, f"Created author profile: {profile.name} successfully")
+            log_user_action(user, f"Created author profile: {profile.name} successfully") #noqa
             messages.success(request, "Author Profile Created Successfully")
             return redirect('dashboard:authors')
         else:
             for field, error in form.errors.items():
                 message = f"{field.title()}: {strip_tags(error)}"
-                log_user_action(
-                    user, f"Tried to create author profile but error occured: {message}")
+                log_user_action(user, f"Tried to create author profile but error occured: {message}") #noqa
                 messages.info(request, message)
                 return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
 
@@ -96,6 +108,12 @@ class BulkUploadAuthorView(View):
             return redirect('dashboard:authors')
 
         for info in infos:
+            old_profile = Profile.objects.filter(scholar_id=info['author_id']).first()  # noqa
+            if old_profile is not None:
+                print(f"Skipping Profile: {old_profile.name}")
+                print("+==================================================+")
+                print("+==================================================+")
+                continue
             scraped = scrape_author_data(info['author_id'])
             author_data = scraped["author_data"]
             # check if profile exists  - if not create profile
@@ -115,7 +133,8 @@ class BulkUploadAuthorView(View):
                     department=info['department'],
                 )
                 profile.save()
-
+                print(f"Created profile: {profile.name}")
+            
             # check if author exists. if not create author
             author = Author.objects.filter(profile=profile).first()
             if author is None:
@@ -124,6 +143,7 @@ class BulkUploadAuthorView(View):
             # get all authors articles/publications
             author_articles = scraped["author_articles"]
 
+            print(f"Updating author: {author.profile.name}")
             # create publications
             for article in author_articles:
                 publication = Publication.objects.filter(citation_id=article['article_citation_id']).first()  # noqa
