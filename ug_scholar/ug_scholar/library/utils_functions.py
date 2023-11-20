@@ -41,14 +41,24 @@ def get_author_ids(csv_file=None) -> list:
 
 def scrape_author_data(author_id: str = "Tpwr9vwAAAAJ") -> dict:
     '''scrapes individual author data from Google Scholar using the author ID'''
+    # NEW KEYS - STUDENTS
+    STUDENT_1 = "a9695dae3cd22abbc740192cdd99753943f351225bd1f5e73564ae5e43775a7a" #noqa
+    STUDENT_2 = "6f6067a532c22da3bcba266193fc04877d8b0726fa7b7f84afd823853057da9b" #noqa
+    STUDENT_3 = "" #noqa
+    STUDENT_4 = "" #noqa
+    STUDENT_5 = "" #noqa
+    
     MINE = "3123fa10ceadfe468d745f03e0df1a305b676fd829965219ec62450692a4cb54" #noqa
+    
+    BECCA = "e90b4032276c7c0fd1a742f9c639cc98fcb71810327db1b0fe83a5b130a8e791" #noqa
     BERNICE = "6880fb5b314bbba29603f694bc4de1f39ead09655b10f41d45852cffa13e32c2" #noqa
     TAWIAH = "ded3dabcba3e4aee20e120d9b923f19e70c7a11aa4d0740ea712e737cc1e904f" #noqa
     STIGAR = "4f940edc13eccb5c0f58327859400c2daab057d5fb1aadfdd4cc1ad9d28cbf89" #noqa
     ERNEST = "7c6cd4ed1b4a2a61f435b25f44bda533e9814853ca5e53ca29f5940088354673" #noqa
     STEPH = "811d5d3af6e8f0ec4faaa72b09d57e2c3aa85d96aa4141aa720fcffa4e224746" #noqa
+    
     params = {
-        "api_key": STEPH,
+        "api_key": BECCA,
         "engine": "google_scholar_author",
         "hl": "en",
         "author_id": author_id  # "Tpwr9vwAAAAJ" - default
