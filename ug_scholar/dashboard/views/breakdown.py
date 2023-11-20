@@ -287,11 +287,11 @@ class FacultyDetailsView(View):
 
         # Calculate total_h_index and total_i10_index for each department
         for department in filtered_departments:
-            authors = Profile.objects.filter(department=department['department'])
-            total_authors = authors.count()
-            authors_with_publications = authors.filter(author__publications__isnull=False).distinct().count()
-            total_h_index = sum(author.get_author_hindex() for author in authors)
-            total_i10_index = sum(author.get_author_i10index() for author in authors)
+            department_authors = Profile.objects.filter(department=department['department'])
+            total_authors = department_authors.count()
+            authors_with_publications = department_authors.filter(author__publications__isnull=False).distinct().count()
+            total_h_index = sum(author.get_author_hindex() for author in department_authors)
+            total_i10_index = sum(author.get_author_i10index() for author in department_authors)
 
             department['total_authors'] = total_authors
             department['authors_with_publications'] = authors_with_publications
@@ -307,7 +307,7 @@ class FacultyDetailsView(View):
             "institution_auth_pub_json": json.dumps(institution_auth_pub),
             "institution_h_index": total_h_index,
             "institution_i_index": total_i_index,
-            "institution_total_authors": total_authors,
+            "institution_total_authors": authors.count(),
             "institution_total_publications": total_pubs,
             "institution_total_citations": total_citations,
             "institution_publishing_authors": publishing_authors,
