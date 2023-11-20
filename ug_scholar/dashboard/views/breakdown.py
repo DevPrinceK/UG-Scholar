@@ -1,6 +1,6 @@
 import json
 
-from django.db.models import Count, Sum
+from django.db.models import Count, Sum, F
 from django.shortcuts import render
 from django.views import View
 
@@ -26,7 +26,7 @@ class CollegesView(View):
 
         # Calculate total_h_index and total_i10_index
         for college in college_breakdown_info_list:
-            authors = Profile.objects.filter(college=college['college'])
+            authors = Profile.objects.filter(college__icontains=college['college'])
             total_autors = authors.count()
             authors_with_publications = authors.filter(author__publications__isnull=False).distinct().count()
             total_h_index = sum(author.get_author_hindex() for author in authors)
@@ -98,13 +98,13 @@ class CollegeDetailsView(View):
 
         # Calculate total_h_index and total_i10_index for each department
         for department in filtered_departments:
-            authors = Profile.objects.filter(department=department['department'])
-            total_authors = authors.count()
-            authors_with_publications = authors.filter(author__publications__isnull=False).distinct().count()
-            total_h_index = sum(author.get_author_hindex() for author in authors)
-            total_i10_index = sum(author.get_author_i10index() for author in authors)
+            department_authors = Profile.objects.filter(department=department['department'])
+            department_total_authors = department_authors.count()
+            authors_with_publications = department_authors.filter(author__publications__isnull=False).distinct().count()
+            total_h_index = sum(author.get_author_hindex() for author in department_authors)
+            total_i10_index = sum(author.get_author_i10index() for author in department_authors)
 
-            department['total_authors'] = total_authors
+            department['total_authors'] = department_total_authors
             department['authors_with_publications'] = authors_with_publications
             department['total_h_index'] = total_h_index
             department['total_i10_index'] = total_i10_index
@@ -134,6 +134,8 @@ class DepartmentDetailsView(View):
     def get(self, request):
         department_name = request.GET.get("department")
         authors = Profile.objects.filter(department=department_name.strip())
+        # top authors by publication count and citation count
+        # top_authors_by_pub_count = authors.order_by('-author__publications__count')[:5]
         total_h_index = 0
         total_i_index = 0
         total_citations = 0
@@ -145,6 +147,20 @@ class DepartmentDetailsView(View):
             total_i_index += author.get_author_i10index()
             total_pubs += author.get_author_publications()
             total_citations += author.get_author_citations() if author.get_author_citations() else 0
+            
+        # top_department_authors = authors.order_by('-total_pubs').order_by('-total_citations')[:5] #noqa
+        
+        top_department_authors = Profile.objects.filter(department=department_name.strip()).annotate(
+            publication_count=Sum(F('author__publications__citations')),
+            citation_count=Sum('author__publications__citations')
+        )
+        
+        for top_author in top_department_authors:
+            top_author.publication_count = top_author.get_author_publications()
+            top_author.citation_count = top_author.get_author_citations()
+            
+        top_department_authors = top_department_authors.order_by('-publication_count')[:5] #noqa
+        # '-publication_count', 
         # compute the department indexes
         department_indexes = [
             {
@@ -167,7 +183,7 @@ class DepartmentDetailsView(View):
                 "index": total_pubs,
             }
         ]
-        
+        print(F"TOP DEPARTMENT AUTHORS: ({department_name})", top_department_authors)
         context = {
             "department_name": department_name,
             "authors": authors,
@@ -179,6 +195,7 @@ class DepartmentDetailsView(View):
             "department_total_publications": total_pubs,
             "department_total_citations": total_citations,
             "department_publishing_authors": publishing_authors,
+            "top_department_authors": top_department_authors,
         }
         return render(request, self.template_name, context)
         
