@@ -72,8 +72,23 @@
             <div class="col-12 col-lg-6">
               <div class="card radius-10">
                   <div class="card-body">
+                    {% comment %}
                       <div id="authorNPubChart" data-performance="{{department_auth_pub_json}}"></div>
+                    {% endcomment %}
+
+                    <h5>Department Top Authors</h5>
+                    <div class="table-responsive" style="height: 325px; overflow-y: scroll;">
+                       {% for author in top_department_authors %}
+                       <hr>
+                        <div class="py-2">
+                            <p class="py-0"> <b>{{author.name}}</b> <span data-bs-toggle="tooltip" data-bs-placement="top" title="Publications">({{author.get_author_publications}})</span> | <span data-bs-toggle="tooltip" data-bs-placement="top" title="Citations">({{author.get_author_citations}})</span> </p>
+                            {{author.rank}}
+                        </div>
+                        <hr>
+                       {% endfor %}
+
                     </div>
+                </div>
               </div>
           </div>
         </div><!--end row-->
