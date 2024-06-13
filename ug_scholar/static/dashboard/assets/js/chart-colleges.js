@@ -67,7 +67,6 @@ $(function () {
 
     });
 
-
     // chart 14
      // Extract college names and total publications from the data
      var college_citations_data = college_breakdown_data.map(function (item) {
@@ -128,6 +127,6 @@ $(function () {
     });
 
 
-   
+    
 
 });

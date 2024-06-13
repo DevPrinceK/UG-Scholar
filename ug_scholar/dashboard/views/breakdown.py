@@ -1,4 +1,5 @@
 import json
+from typing import List
 
 from django.db.models import Count, Sum, F
 from django.shortcuts import render
@@ -133,9 +134,8 @@ class DepartmentDetailsView(View):
     
     def get(self, request):
         department_name = request.GET.get("department")
+        query = request.GET.get("author-query")
         authors = Profile.objects.filter(department=department_name.strip())
-        # top authors by publication count and citation count
-        # top_authors_by_pub_count = authors.order_by('-author__publications__count')[:5]
         total_h_index = 0
         total_i_index = 0
         total_citations = 0
@@ -147,9 +147,7 @@ class DepartmentDetailsView(View):
             total_i_index += author.get_author_i10index()
             total_pubs += author.get_author_publications()
             total_citations += author.get_author_citations() if author.get_author_citations() else 0
-            
-        # top_department_authors = authors.order_by('-total_pubs').order_by('-total_citations')[:5] #noqa
-        
+                    
         top_department_authors = Profile.objects.filter(department=department_name.strip()).annotate(
             publication_count=Sum(F('author__publications__citations')),
             citation_count=Sum('author__publications__citations')
@@ -186,7 +184,7 @@ class DepartmentDetailsView(View):
         print(F"TOP DEPARTMENT AUTHORS: ({department_name})", top_department_authors)
         context = {
             "department_name": department_name,
-            "authors": authors,
+            "authors": [] if ((query == "") or (query == None)) else authors.filter(name__icontains=query.strip()),
             "department_indexes_json": json.dumps(department_indexes),
             "department_auth_pub_json": json.dumps(department_auth_pub),
             "department_h_index": total_h_index,
@@ -239,6 +237,7 @@ class FacultyDetailsView(View):
     
     def get(self, request):
         institution_name = request.GET.get("institution")
+        query = request.GET.get("author-query")
         authors = Profile.objects.filter(school=institution_name.strip())
         total_h_index = 0
         total_i_index = 0
@@ -302,7 +301,7 @@ class FacultyDetailsView(View):
        
         context = {
             "institution_name": institution_name,
-            "authors": authors,
+            "authors": [] if ((query == "") or (query == None)) else authors.filter(name__icontains=query.strip()),
             "institution_indexes_json": json.dumps(institution_indexes),
             "institution_auth_pub_json": json.dumps(institution_auth_pub),
             "institution_h_index": total_h_index,

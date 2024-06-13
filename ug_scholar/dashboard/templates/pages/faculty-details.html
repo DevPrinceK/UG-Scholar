@@ -116,12 +116,27 @@
         <hr/>
         <div class="card">
             <div class="card-body">
+                <form action="{% url 'dashboard:institution_details' %}" method="GET" style="display: inline;">
+                <input type="hidden" name="institution" value="{{institution_name}}">
+                <div class="row">
+                    <div class="col-10">
+                            <input type="text" name="author-query" class="form-control" placeholder="Search author from department">
+                        </div>
+                    <div class="col-2">
+                        <button type="submit" class="btn btn-primary">Search</button>
+                    </div>
+                </div>
+            </form>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
                 <div class="table-responsive">
                     <table id="example" class="table table-striped table-bordered" style="width:100%">
                         <thead>
                             <tr>
                                 <th>Profile</th>
-                                <th>SCHOLAR</th>
+                                <th>#SCHOLAR</th>
                                 <th>PUBLICATIONS</th>
                                 <th>CITATIONS</th>
                                 <th>H-INDEX</th>
@@ -133,13 +148,11 @@
                                     {% for info in authors %}
                                     <tr>
                                         <td> <img src=" {% if info.thumbnail %} {{info.thumbnail}} {% else %} https://scholar.google.com/citations/images/avatar_scholar_128.png {% endif %} " style="height: 60px; width:auto;"></td>
-                                        
                                         <td>
                                             <a href="https://scholar.google.com/citations?hl=en&user={{info.scholar_id}}" target="_blank">
                                             {{info.name}} <br> <small class="text-info">{{info.rank}}</small> 
                                             </a>
                                         </td> 
-                                        
                                         <td>{{info.get_author_publications|intcomma }}</td>
                                         <td>{{info.get_author_citations|intcomma }}</td>
                                         <td>{{info.get_author_hindex|intcomma }}</td>

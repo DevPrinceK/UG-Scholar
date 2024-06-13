@@ -104,7 +104,7 @@
                 <div class="card radius-10 w-100">
                     <div class="card-body">
                         <div class="d-flex align-items-center mb-3">
-                            <h5 class="mb-0">Top Journals Performance</h5>
+                            <h5 class="mb-0">Research Thematic Areas</h5>
                             <div class="dropdown options ms-auto">
                                 <div class="dropdown-toggle dropdown-toggle-nocaret" data-bs-toggle="dropdown">
                                     <i class='bx bx-dots-horizontal-rounded'></i>
@@ -113,7 +113,8 @@
                         </div>
 
                         <div class="chart-js-container1">
-                            <canvas id="chart1" data-performance="{{top_journals_json}}"></canvas>
+                            <canvas id="apexChart" data-performance=""></canvas>
+                            <!-- <canvas id="thematic-chart" data-performance=""></canvas> -->
                         </div>
 
                     </div>
@@ -374,6 +375,14 @@
 {% endblock %}
 
 {% comment %} for charts {% endcomment %}
+
 {% block custom_scripts %}
-<script src="{% static 'dashboard/assets/js/dashboard-sales.js' %}"></script>
+<!-- collect charts -->
+<!-- <script src="https://code.highcharts.com/modules/accessibility.js"></script> -->
+ {% comment %}
+<script src="{% static 'dashboard/assets/js/highcharts.js' %}"></script>
+{% endcomment %}
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+ <script src="{% static 'dashboard/assets/js/thematic-chart.js' %}"></script>
 {% endblock custom_scripts %}
+

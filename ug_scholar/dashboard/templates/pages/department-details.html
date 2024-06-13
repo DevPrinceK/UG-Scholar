@@ -72,9 +72,6 @@
             <div class="col-12 col-lg-6">
               <div class="card radius-10">
                   <div class="card-body">
-                    {% comment %}
-                      <div id="authorNPubChart" data-performance="{{department_auth_pub_json}}"></div>
-                    {% endcomment %}
 
                     <h5>Department Top Authors</h5>
                     <div class="table-responsive" style="height: 325px; overflow-y: scroll;">
@@ -93,8 +90,23 @@
           </div>
         </div><!--end row-->
 
-        <h6 class="mb-0 text-uppercase">Department Authors</h6>
+        <h6 class="mb-0 text-uppercase">Search Department Authors</h6>
         <hr/>
+        <div class="card">
+            <div class="card-body">
+                <form action="{% url 'dashboard:department_details' %}" method="GET" style="display: inline;">
+                <input type="hidden" name="department" value="{{department_name}}">
+                <div class="row">
+                    <div class="col-10">
+                            <input type="text" name="author-query" class="form-control" placeholder="Search author from department">
+                        </div>
+                    <div class="col-2">
+                        <button type="submit" class="btn btn-primary">Search</button>
+                    </div>
+                </div>
+            </form>
+            </div>
+        </div>
         <div class="card">
             <div class="card-body">
                 <div class="table-responsive">
