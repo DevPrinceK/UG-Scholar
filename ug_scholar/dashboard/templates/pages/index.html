@@ -113,8 +113,9 @@
                         </div>
 
                         <div class="chart-js-container1">
-                            <canvas id="apexChart" data-performance=""></canvas>
-                            <!-- <canvas id="thematic-chart" data-performance=""></canvas> -->
+                            <!-- <canvas id="apexChart" data-performance=""></canvas> -->
+                            <!-- Highcharts requires a div container, not a canvas -->
+                            <div id="thematic-chart" data-performance=""></div>
                         </div>
 
                     </div>
@@ -379,10 +380,8 @@
 {% block custom_scripts %}
 <!-- collect charts -->
 <!-- <script src="https://code.highcharts.com/modules/accessibility.js"></script> -->
- {% comment %}
 <script src="{% static 'dashboard/assets/js/highcharts.js' %}"></script>
-{% endcomment %}
-<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
- <script src="{% static 'dashboard/assets/js/thematic-chart.js' %}"></script>
+<!-- <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script> -->
+<script src="{% static 'dashboard/assets/js/thematic-chart.js' %}"></script>
 {% endblock custom_scripts %}
 
