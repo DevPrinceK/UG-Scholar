@@ -67,6 +67,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'ug_scholar.wsgi.application'
+ASGI_APPLICATION = 'ug_scholar.asgi.application'
 
 
 # Database
