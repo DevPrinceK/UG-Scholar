@@ -20,6 +20,7 @@ urlpatterns += [
     path('authors/', views.AuthorsView.as_view(), name='authors'),
     path('create-author/', views.CreateUpdateAuthorView.as_view(), name='create_author'),
     path('publications/', views.PublicationsView.as_view(), name='publications'),
+    path('publications/refresh/', views.RefreshPublicationsView.as_view(), name='refresh_publications'),
     path('download-sample-file/', views.DownloadSampleBulkFileView.as_view(), name='download_aut_csv'), #noqa
     path('bulk-upload-authors/', views.BulkUploadAuthorView.as_view(), name='bulk_upload_authors'), #noqa
 ]
