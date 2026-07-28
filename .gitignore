@@ -147,3 +147,4 @@ ug_scholar/static/dashboard/assets/js/testCharts.js
 deployment
 
 db.sqlite3
+ug_scholar/db.sqlite3
