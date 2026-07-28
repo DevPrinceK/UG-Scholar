@@ -8,12 +8,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = get_random_secret_key()
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY") or get_random_secret_key()
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DJANGO_DEBUG", "true").lower() in {"1", "true", "yes"}
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in os.getenv("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
+    if host.strip()
+]
 
 
 # Application definition
@@ -73,12 +77,23 @@ ASGI_APPLICATION = 'ug_scholar.asgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+if os.getenv("DATABASE_URL"):
+    import dj_database_url
+
+    DATABASES = {
+        "default": dj_database_url.parse(
+            os.environ["DATABASE_URL"],
+            conn_max_age=60,
+            conn_health_checks=True,
+        )
     }
-}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
 
 
 # Password validation
@@ -101,7 +116,11 @@ AUTH_PASSWORD_VALIDATORS = [
 
 
 # django cors headers settings
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_ALL_ORIGINS = os.getenv("CORS_ALLOW_ALL_ORIGINS", "false").lower() in {
+    "1",
+    "true",
+    "yes",
+}
 
 # custom user model
 AUTH_USER_MODEL = 'accounts.User'
@@ -143,3 +162,15 @@ MEDIA_ROOT = BASE_DIR / "assets"
 
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# Scholarly metadata provider. OpenAlex is the default because it offers a
+# documented API and a free daily allowance. SerpAPI remains an opt-in fallback.
+SCHOLAR_DATA_PROVIDER = os.getenv("SCHOLAR_DATA_PROVIDER", "openalex")
+OPENALEX_API_KEY = os.getenv("OPENALEX_API_KEY", "")
+SERPAPI_API_KEY = os.getenv("SERPAPI_API_KEY", "")
+SCHOLAR_HTTP_TIMEOUT = int(os.getenv("SCHOLAR_HTTP_TIMEOUT", "30"))
+SCHOLAR_USER_AGENT = os.getenv(
+    "SCHOLAR_USER_AGENT",
+    "UG-Scholar/1.0 (mailto:library@ug.edu.gh)",
+)
