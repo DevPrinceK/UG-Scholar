@@ -3,6 +3,14 @@
 {% block content %}
 <div class="page-wrapper">
     <div class="page-content">
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-info alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+        {% endif %}
         <!--breadcrumb-->
         <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
             <div class="breadcrumb-title pe-3">Publications</div>
@@ -16,12 +24,36 @@
                     </ol>
                 </nav>
             </div>
+            {% if request.user.is_authenticated and request.user.is_superuser %}
+            <div class="ms-auto">
+                <form action="{% url 'dashboard:refresh_publications' %}" method="post" onsubmit="return confirm('Queue a metadata refresh for all authors?');">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-warning">Queue Metadata Refresh</button>
+                </form>
+            </div>
+            {% endif %}
         </div>
         <!--end breadcrumb-->
         <h6 class="mb-0 text-uppercase">Publications Information</h6>
         <hr />
+        {% if latest_sync %}
+        <p class="text-muted small">
+            Latest refresh #{{ latest_sync.id }}:
+            {{ latest_sync.get_status_display }}
+            ({{ latest_sync.processed_profiles }}/{{ latest_sync.total_profiles }} authors)
+        </p>
+        {% endif %}
         <div class="card">
             <div class="card-body">
+                <form method="get" class="row g-2 mb-3">
+                    <div class="col-md-10">
+                        <input name="q" value="{{ query }}" class="form-control"
+                            placeholder="Search title, author, journal, or DOI">
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-primary w-100" type="submit">Search</button>
+                    </div>
+                </form>
                 <div class="table-responsive">
                     <table id="example" class="table table-striped table-bordered" style="width:100%">
                         <thead>
@@ -63,6 +95,7 @@
                         </tfoot>
                     </table>
                 </div>
+                {% include "includes/pagination.html" %}
             </div>
         </div>
     </div>
@@ -72,7 +105,11 @@
 <script>
 
     $(document).ready(function () {
-        $('#example').DataTable()
+        $('#example').DataTable({
+            paging: false,
+            searching: false,
+            info: false
+        })
     });
 
 </script>
