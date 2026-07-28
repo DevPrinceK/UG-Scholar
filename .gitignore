@@ -140,3 +140,7 @@ GitHub.sublime-settings
 .history
 *.csv
 ug_scholar/static/dashboard/assets/js/testCharts.js
+
+
+# deployment files
+deployment
