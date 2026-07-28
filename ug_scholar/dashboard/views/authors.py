@@ -1,217 +1,159 @@
 import csv
-import os
-import json
+
 from django.contrib import messages
-from django.http import HttpResponseRedirect
-from django.http.response import HttpResponse
+from django.core.paginator import Paginator
+from django.db.models import Count, IntegerField, Q, Sum, Value
+from django.db.models.functions import Coalesce
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect, render
 from django.utils.decorators import method_decorator
 from django.utils.html import strip_tags
 from django.views import View
 
-from api.models import Author, Profile, Publication
+from api.models import Author, Profile
+from api.services import queue_sync
 from dashboard.forms import AuthorProfileForm
-from dashboard.views import publications
-from dashboard.views.publications import PublicationsView
 from ug_scholar.library.constants import UG, SampleAuthorData
 from ug_scholar.library.decorators import AdministratorsOnly
-from ug_scholar.library.utils_functions import get_author_ids, log_user_action, scrape_author_data
+from ug_scholar.library.utils_functions import get_author_ids, log_user_action
 
 
 class AuthorsView(View):
-    '''Renders the authors profiles page - profiles page'''
-    template_name = 'pages/authors.html'
+    template_name = "pages/authors.html"
 
     def get(self, request):
         ug = UG()
-        authors = Profile.objects.all()
-
-        schools = ug.get_schools()
-        departments = ug.get_departments()
-        colleges = ug.get_colleges()
-        ranks = ug.get_ranks()
-
+        query = (request.GET.get("q") or "").strip()
+        authors = Profile.objects.select_related("author").annotate(
+            publication_count=Count("author__publications", distinct=True),
+            citation_count=Coalesce(
+                Sum("author__publications__citations"),
+                Value(0),
+                output_field=IntegerField(),
+            ),
+        )
+        if query:
+            authors = authors.filter(
+                Q(name__icontains=query)
+                | Q(scholar_id__icontains=query)
+                | Q(department__icontains=query)
+                | Q(school__icontains=query)
+            )
+        authors = authors.order_by("name", "pk")
+        page = Paginator(authors, 100).get_page(request.GET.get("page"))
         context = {
-            'authors': authors,
-            'colleges': colleges,
-            'schools': schools,
-            'departments': departments,
-            'ranks': ranks,
+            "authors": page,
+            "page_obj": page,
+            "query": query,
+            "colleges": ug.get_colleges(),
+            "schools": ug.get_schools(),
+            "departments": ug.get_departments(),
+            "ranks": ug.get_ranks(),
         }
         return render(request, self.template_name, context)
 
 
 class CreateUpdateAuthorView(View):
-    '''Renders the create/update author page'''
-
     def get(self, request):
-        user = request.user
-        log_user_action(user, "Tried to access author form using get request")
-        return redirect('dashboard:authors')
+        log_user_action(request.user, "Tried to access author form using get request")
+        return redirect("dashboard:authors")
 
     @method_decorator(AdministratorsOnly)
     def post(self, request):
         user = request.user
-        scholar_id = request.POST.get('scholar_id')
-        profile = Profile.objects.filter(scholar_id=scholar_id).first()
-        if profile is not None:
-            log_user_action(user, "Tried to create author profile with an already existing scholar id") #noqa
+        scholar_id = (request.POST.get("scholar_id") or "").strip()
+        if Profile.objects.filter(scholar_id=scholar_id).exists():
+            log_user_action(
+                user, "Tried to create author profile with an existing scholar id"
+            )
             messages.info(request, "Author Profile Already Exists")
-            return redirect('dashboard:authors')
-        # author does not exist, create new author profile
-        print(f"Scrapping author data for profile: {scholar_id}")
-        try:
-            scraped = scrape_author_data(scholar_id)
-        except Exception as e:
-            messages.info(request, f"Error occured: {e}")
-            return redirect('dashboard:authors')
-        author_data = scraped["author_data"]
+            return redirect("dashboard:authors")
+
         form = AuthorProfileForm(request.POST)
         if form.is_valid():
-            profile = form.save(commit=False)
-            if author_data is not None or author_data != {}:
-                profile.name = author_data['name']
-                profile.affiliation = author_data['affiliations']
-                profile.thumbnail = author_data['thumbnail']
-                profile.interests = json.dumps(author_data['interests'])
-                profile.statistics = json.dumps(author_data['cited_by_table'])
-            profile.save()
-            author = Author.objects.create(profile=profile)
-            author.save()
-            log_user_action(user, f"Created author profile: {profile.name} successfully") #noqa
-            messages.success(request, "Author Profile Created Successfully")
-            return redirect('dashboard:authors')
-        else:
-            for field, error in form.errors.items():
-                message = f"{field.title()}: {strip_tags(error)}"
-                log_user_action(user, f"Tried to create author profile but error occured: {message}") #noqa
-                messages.info(request, message)
-                return HttpResponseRedirect(request.META.get("HTTP_REFERER"))
+            profile = form.save()
+            Author.objects.get_or_create(profile=profile)
+            run, _ = queue_sync(requested_by=user, profile_ids=[profile.pk])
+            log_user_action(user, f"Created author profile: {profile}")
+            messages.success(
+                request,
+                f"Author created. Metadata refresh #{run.pk} has been queued.",
+            )
+            return redirect("dashboard:authors")
+
+        for field, error in form.errors.items():
+            message = f"{field.title()}: {strip_tags(error)}"
+            log_user_action(user, f"Author form error: {message}")
+            messages.info(request, message)
+        return HttpResponseRedirect(request.META.get("HTTP_REFERER", "/authors/"))
 
 
 class BulkUploadAuthorView(View):
-    '''Used to implement bulk upload of author profiles: POST request'''
-
     def get(self, request):
-        user = request.user
-        log_user_action(user, "Tried to access bulk upload author form using get request")  # noqa
-        return redirect('dashboard:authors')
+        log_user_action(
+            request.user, "Tried to access bulk upload author form using get request"
+        )
+        return redirect("dashboard:authors")
 
+    @method_decorator(AdministratorsOnly)
     def post(self, request):
-        updated_authors = 0
-        updated_publications = 0
-        csv_file = request.FILES.get('csv_file')
+        authors_only = request.POST.get("authors_only") == "on"
+        csv_file = request.FILES.get("csv_file")
+        if not csv_file:
+            messages.info(request, "Please choose a CSV file.")
+            return redirect("dashboard:authors")
         try:
             infos = get_author_ids(csv_file)
-        except Exception as e:
-            messages.info(request, f"Error occured: {e}")
-            return redirect('dashboard:authors')
+        except Exception as exc:
+            messages.info(request, f"Could not read CSV: {exc}")
+            return redirect("dashboard:authors")
 
+        profile_ids = []
         for info in infos:
-            old_profile = Profile.objects.filter(scholar_id=info['author_id']).first()  # noqa
-            if old_profile is not None:
-                print(f"Skipping Profile: {old_profile.name}")
-                print("+==================================================+")
-                print("+==================================================+")
-                continue
-            scraped = scrape_author_data(info['author_id'])
-            author_data = scraped["author_data"]
-            # check if profile exists  - if not create profile
-            profile = Profile.objects.filter(scholar_id=info['author_id']).first()  # noqa
-            if profile is None:
-                profile = Profile.objects.create(
-                    name=author_data['name'],
-                    scholar_id=info['author_id'],
-                    affiliation=author_data['affiliations'],
-                    thumbnail=author_data['thumbnail'],
-                    interests=json.dumps(author_data['interests']),
-                    statistics=json.dumps(author_data['cited_by_table']),
-                    rank=info['rank'],
-                    email=info['email'],
-                    college=info['college'],
-                    school=info['school'],
-                    department=info['department'],
-                )
-                profile.save()
-                print(f"Created profile: {profile.name}")
-            
-            # check if author exists. if not create author
-            author = Author.objects.filter(profile=profile).first()
-            if author is None:
-                author = Author.objects.create(profile=profile)
-                author.save()
-            # get all authors articles/publications
-            author_articles = scraped["author_articles"]
+            defaults = {
+                key: info.get(key) or None
+                for key in ("name", "rank", "email", "college", "school", "department")
+            }
+            profile, _ = Profile.objects.update_or_create(
+                scholar_id=info["author_id"], defaults=defaults
+            )
+            Author.objects.get_or_create(profile=profile)
+            profile_ids.append(profile.pk)
 
-            print(f"Updating author: {author.profile.name}")
-            # create publications
-            for article in author_articles:
-                publication = Publication.objects.filter(citation_id=article['article_citation_id']).first()  # noqa
-                # Handle null citation values
-                citation_value = article['article_cited_by_value']
-                article_year = article['article_year']
-                if citation_value is None or citation_value == "":
-                    citation_value = 0
-                else:
-                    # make sure citation value is an integer
-                    citation_value = int(citation_value)
-                if article_year is None or article_year == "":
-                    article_year = 1900
-                else:
-                    # make sure article year is a number
-                    article_year = int(article_year)
-
-                if publication is None:
-                    # create new publication
-                    publication = Publication.objects.create(
-                        title=article['article_title'],
-                        year=article_year,
-                        link=article['article_link'],
-                        citation_id=article['article_citation_id'],
-                        authors=article['article_authors'],
-                        journal=article['article_publication'],
-                        citations=citation_value,
-                    )
-                    publication.save()
-                else:
-                    # update publication
-                    publication.title = article['article_title']
-                    publication.year = article_year
-                    publication.link = article['article_link'],
-                    publication.citation_id = article['article_citation_id']
-                    publication.authors = article['article_authors']
-                    publication.journal = article['article_publication']
-                    publication.citations = citation_value
-                    publication.save()
-                # add publication to author if not already added
-                if publication not in author.publications.all():
-                    author.publications.add(publication)
-                    author.save()
-                else:
-                    # remove the old publication and add the new one
-                    author.publications.remove(publication)
-                    author.publications.add(publication)
-                    author.save()
-                # update the count of updated publications and authors
-                updated_publications += 1
-            updated_authors += 1
-        messages.success(request, f"Updated {updated_authors} authors with {updated_publications} publications")  # noqa
-        log_user_action(request.user, "Updated the system using bulk author upload successfully")  # noqa
-        return redirect('dashboard:authors')
+        if not authors_only and profile_ids:
+            run, _ = queue_sync(requested_by=request.user, profile_ids=profile_ids)
+            messages.success(
+                request,
+                f"Imported {len(profile_ids)} authors; refresh #{run.pk} queued.",
+            )
+        else:
+            messages.success(request, f"Imported {len(profile_ids)} authors.")
+        log_user_action(request.user, "Imported authors from CSV")
+        return redirect("dashboard:authors")
 
 
 class DownloadSampleBulkFileView(View):
-    '''Used to download a sample csv file for bulk upload'''
-
     def get(self, request):
         sample_data = SampleAuthorData().get_author_sample_data()
-        response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = 'attachment; filename="bulk_author_upload_sample.csv"'
-
+        response = HttpResponse(content_type="text/csv; charset=utf-8")
+        response["Content-Disposition"] = (
+            'attachment; filename="bulk_author_upload_sample.csv"'
+        )
+        response.write("\ufeff")
         writer = csv.writer(response)
-        writer.writerow(['scholar', 'email', "college", 'school', 'department', 'rank']) # noqa
-        
+        writer.writerow(
+            ["scholar", "name", "email", "college", "school", "department", "rank"]
+        )
         for data in sample_data:
-            writer.writerow([data['scholar'], data['email'], data['college'], data['school'], data['department'], data['rank']])
-            
+            writer.writerow(
+                [
+                    data["scholar"],
+                    data.get("name", ""),
+                    data["email"],
+                    data["college"],
+                    data["school"],
+                    data["department"],
+                    data["rank"],
+                ]
+            )
         return response
