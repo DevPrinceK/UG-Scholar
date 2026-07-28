@@ -4,6 +4,7 @@
 *.pyc
 __pycache__
 # db.sqlite3
+db.sqlite3
 media
 
 # Backup files # 
@@ -144,3 +145,5 @@ ug_scholar/static/dashboard/assets/js/testCharts.js
 
 # deployment files
 deployment
+
+db.sqlite3
