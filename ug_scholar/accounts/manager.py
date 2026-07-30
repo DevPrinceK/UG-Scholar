@@ -5,9 +5,10 @@ class AccountManager(BaseUserManager):
     '''manages User account creation'''
 
     def create_user(self, email, password, fullname='-', **kwargs):
-        user = self.model(email=email, password=password, fullname=fullname, **kwargs)  # noqa
+        email = self.normalize_email(email).strip().lower()
+        user = self.model(email=email, fullname=fullname, **kwargs)
         user.set_password(password)
-        user.save()
+        user.save(using=self._db)
         return user
 
     def create_superuser(self, email, password, fullname='-', **kwargs):
