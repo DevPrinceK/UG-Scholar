@@ -1,0 +1,175 @@
+{% extends "base/base.html" %}
+{% load static %}
+{% block content %}
+<div class="page-wrapper">
+    <div class="page-content">
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-info alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+        {% endif %}
+
+        <div class="page-breadcrumb d-none d-sm-flex align-items-center mb-3">
+            <div class="breadcrumb-title pe-3">Manual Fetch</div>
+            <div class="ps-3">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-0 p-0">
+                        <li class="breadcrumb-item">
+                            <a href="{% url 'dashboard:index' %}"><i class="bx bx-home-alt"></i></a>
+                        </li>
+                        <li class="breadcrumb-item active" aria-current="page">Manual Fetch</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12 col-xl-7">
+                <div class="card radius-10">
+                    <div class="card-body">
+                        <h5 class="mb-2">Fetch publication metadata</h5>
+                        <p class="text-light-2">
+                            Choose a provider and optionally restrict the fetch to one author.
+                            The request is queued so this page stays responsive.
+                        </p>
+                        <form method="post" id="manual-fetch-form">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label for="provider" class="form-label">Provider</label>
+                                <select class="form-select" id="provider" name="provider" required>
+                                    {% for provider in providers %}
+                                    <option value="{{ provider.value }}">
+                                        {{ provider.label }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                                <div class="form-text text-light-2">
+                                    OpenAlex is the default. SerpAPI fetches Google Scholar data and requires an API key.
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="profile_id" class="form-label">Author</label>
+                                <select class="form-select" id="profile_id" name="profile_id">
+                                    <option value="">All authors</option>
+                                    {% for profile in profiles %}
+                                    <option value="{{ profile.pk }}">
+                                        {{ profile.name|default:profile.scholar_id }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-warning"
+                                onclick="return confirm('Queue this publication fetch?');">
+                                <i class="bx bx-cloud-download me-1"></i>Queue Fetch
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-xl-5">
+                <div class="card radius-10">
+                    <div class="card-body">
+                        <h5 class="mb-3">Recent fetches</h5>
+                        {% if sync_runs %}
+                        <div class="table-responsive">
+                            <table class="table align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Provider</th>
+                                        <th>Status</th>
+                                        <th>Progress</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for run in sync_runs %}
+                                    <tr data-sync-run="{{ run.pk }}">
+                                        <td>{{ run.pk }}</td>
+                                        <td>
+                                            {% if run.provider == "google_scholar" or run.provider == "serpapi" %}
+                                            SerpAPI
+                                            {% else %}
+                                            OpenAlex
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <span data-sync-status>{{ run.get_status_display }}</span>
+                                            <div class="small text-light-2" data-sync-detail>
+                                                {% if run.updated_publications %}
+                                                {{ run.updated_publications }} publications updated
+                                                {% endif %}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span data-sync-progress>
+                                                {{ run.processed_profiles }}/{{ run.total_profiles }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <p class="text-light-2 mb-0">No publication fetches have been queued yet.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block custom_scripts %}
+<script>
+    (() => {
+        const statusUrl = "{% url 'dashboard:manual_fetch_status' %}";
+
+        function updateRun(run) {
+            const row = document.querySelector(`[data-sync-run="${run.id}"]`);
+            if (!row) return;
+
+            row.querySelector("[data-sync-status]").textContent = run.status_label;
+            row.querySelector("[data-sync-progress]").textContent =
+                `${run.processed_profiles}/${run.total_profiles}`;
+
+            const details = [];
+            if (run.updated_publications) {
+                details.push(`${run.updated_publications} publications updated`);
+            }
+            if (run.failed_profiles) {
+                details.push(`${run.failed_profiles} failed`);
+            }
+            if (run.error && run.status !== "running") {
+                details.push(run.error.split("\n")[0]);
+            }
+            row.querySelector("[data-sync-detail]").textContent = details.join(" · ");
+        }
+
+        async function pollFetchStatus() {
+            try {
+                const response = await fetch(statusUrl, {
+                    credentials: "same-origin",
+                    cache: "no-store",
+                    headers: {"Accept": "application/json"},
+                });
+                if (!response.ok) return;
+                const payload = await response.json();
+                payload.runs.forEach(updateRun);
+                if (payload.active) {
+                    window.setTimeout(pollFetchStatus, 3000);
+                }
+            } catch (error) {
+                window.setTimeout(pollFetchStatus, 5000);
+            }
+        }
+
+        pollFetchStatus();
+    })();
+</script>
+{% endblock custom_scripts %}

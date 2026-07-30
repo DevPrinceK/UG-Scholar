@@ -7,6 +7,7 @@ from django.shortcuts import render
 from django.views import View
 
 from api.models import Author, Profile, Publication
+from api.services.thematic import THEMATIC_AREAS, UNCLASSIFIED_AREA
 
 
 def _group_breakdown(field, limit=None):
@@ -169,6 +170,17 @@ class IndexView(View):
             Publication.objects.prefetch_related("author_entities__profile")
             .order_by("-citations")[:10]
         )
+        thematic_counts = {
+            row["thematic_area"]: row["count"]
+            for row in Publication.objects.values("thematic_area").annotate(
+                count=Count("id")
+            )
+        }
+        thematic_areas = [
+            {"name": area, "count": thematic_counts.get(area, 0)}
+            for area in (*THEMATIC_AREAS, UNCLASSIFIED_AREA)
+            if thematic_counts.get(area, 0)
+        ]
         profile_metrics = Profile.objects.aggregate(
             total_hindex=Coalesce(Sum("h_index"), Value(0)),
             total_i10index=Coalesce(Sum("i10_index"), Value(0)),
@@ -199,5 +211,6 @@ class IndexView(View):
             ),
             "top_journals_json": json.dumps(journals_data),
             "schools_publications_json": json.dumps(schools_pub_data),
+            "thematic_areas_json": json.dumps(thematic_areas),
         }
         return render(request, self.template_name, context)

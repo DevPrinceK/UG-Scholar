@@ -24,12 +24,11 @@
                     </ol>
                 </nav>
             </div>
-            {% if request.user.is_authenticated and request.user.is_superuser %}
+            {% if request.user.is_authenticated and request.user.is_superuser or request.user.is_staff %}
             <div class="ms-auto">
-                <form action="{% url 'dashboard:refresh_publications' %}" method="post" onsubmit="return confirm('Queue a metadata refresh for all authors?');">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-sm btn-warning">Queue Metadata Refresh</button>
-                </form>
+                <a href="{% url 'dashboard:manual_fetch' %}" class="btn btn-sm btn-warning">
+                    Manual Fetch
+                </a>
             </div>
             {% endif %}
         </div>

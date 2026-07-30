@@ -135,7 +135,7 @@ class OpenAlexProvider(PublicationProvider):
                     "cursor": cursor,
                     "select": (
                         "id,doi,display_name,publication_year,primary_location,"
-                        "authorships,cited_by_count"
+                        "authorships,cited_by_count,primary_topic,topics,keywords"
                     ),
                 },
             )
@@ -143,6 +143,35 @@ class OpenAlexProvider(PublicationProvider):
             next_cursor = (payload.get("meta") or {}).get("next_cursor")
             cursor = next_cursor if next_cursor and next_cursor != cursor else None
         return works
+
+    @staticmethod
+    def _work_topics(work):
+        topics = []
+        seen = set()
+        primary_id = ((work.get("primary_topic") or {}).get("id"))
+        for topic in [
+            work.get("primary_topic"),
+            *(work.get("topics") or []),
+            *(work.get("keywords") or []),
+        ]:
+            if not topic:
+                continue
+            topic_id = topic.get("id") or topic.get("display_name")
+            if not topic_id or topic_id in seen:
+                continue
+            seen.add(topic_id)
+            topics.append(
+                {
+                    "id": topic.get("id"),
+                    "name": topic.get("display_name"),
+                    "score": topic.get("score", 1),
+                    "primary": topic.get("id") == primary_id,
+                    "subfield": (topic.get("subfield") or {}).get("display_name"),
+                    "field": (topic.get("field") or {}).get("display_name"),
+                    "domain": (topic.get("domain") or {}).get("display_name"),
+                }
+            )
+        return topics
 
     def fetch_author(self, profile):
         author_id = self._resolve_author_id(profile)
@@ -187,6 +216,7 @@ class OpenAlexProvider(PublicationProvider):
                     "article_authors": authors,
                     "article_publication": source.get("display_name"),
                     "article_cited_by_value": work.get("cited_by_count") or 0,
+                    "provider_topics": self._work_topics(work),
                 }
             )
 

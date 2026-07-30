@@ -54,6 +54,7 @@ class AuthorsView(View):
 
 
 class CreateUpdateAuthorView(View):
+    @method_decorator(AdministratorsOnly)
     def get(self, request):
         log_user_action(request.user, "Tried to access author form using get request")
         return redirect("dashboard:authors")
@@ -89,6 +90,7 @@ class CreateUpdateAuthorView(View):
 
 
 class BulkUploadAuthorView(View):
+    @method_decorator(AdministratorsOnly)
     def get(self, request):
         log_user_action(
             request.user, "Tried to access bulk upload author form using get request"

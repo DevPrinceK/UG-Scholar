@@ -1,19 +1,27 @@
 {% load static %}
 <header>
+    {% static 'dashboard/assets/images/app/google-scholar.png' as fallback_avatar %}
     <div class="topbar d-flex align-items-center">
         <nav class="navbar navbar-expand gap-3">
             <div class="mobile-toggle-menu"><i class='bx bx-menu'></i>
             </div>
-            <div class="search-bar flex-grow-1">
+            <form class="search-bar flex-grow-1" method="get"
+                action="{% url 'dashboard:global_search' %}" role="search">
                 <div class="position-relative search-bar-box">
-                    <input type="text" class="form-control search-control" placeholder="Type to search..."> <span class="position-absolute top-50 search-show translate-middle-y"><i class='bx bx-search'></i></span>
+                    <input type="search" name="q" value="{{ global_search_query|default:'' }}"
+                        class="form-control search-control"
+                        placeholder="Search authors, publications, journals, or departments"
+                        aria-label="Global search">
+                    <button type="submit"
+                        class="position-absolute top-50 search-show translate-middle-y border-0 bg-transparent p-0"
+                        aria-label="Submit search"><i class='bx bx-search'></i></button>
                     <span class="position-absolute top-50 search-close translate-middle-y"><i class='bx bx-x'></i></span>
                 </div>
-            </div>
+            </form>
             <div class="top-menu ms-auto">
                 <ul class="navbar-nav align-items-center gap-1">
                     <li class="nav-item mobile-search-icon d-flex d-lg-none" data-bs-toggle="modal" data-bs-target="#SearchModal">
-                        <a class="nav-link" href="avascript:;"><i class='bx bx-search'></i>
+                        <a class="nav-link" href="javascript:;"><i class='bx bx-search'></i>
                         </a>
                     </li>
 
@@ -106,9 +114,11 @@
                 <a class="d-flex align-items-center nav-link dropdown-toggle gap-3 dropdown-toggle-nocaret" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                     
                     {% if request.user.is_authenticated and request.user.is_superuser or request.user.is_staff %}
-                    <img src="{% if request.user.profile_picture %} {{request.user.profile_picture.url}} {% else %} {% static 'dashboard/assets/images/app/google-scholar.png' %} {% endif %}" class="user-img" alt="user avatar">
+                    <img src="{% if request.user.profile_picture %}{{ request.user.profile_picture.url }}{% else %}{{ fallback_avatar }}{% endif %}"
+                        class="user-img" alt="user avatar"
+                        onerror="this.onerror=null;this.src='{{ fallback_avatar }}';">
                     {% else %}
-                    <img src="{% static 'dashboard/assets/images/app/google-scholar.png' %}" class="user-img" alt="user profile">
+                    <img src="{{ fallback_avatar }}" class="user-img" alt="user profile">
                     {% endif %}
                     
                     <!-- Do conditional rendering here - only admins -->
@@ -129,7 +139,14 @@
                     <li><a class="dropdown-item d-flex align-items-center" href="{% url 'dashboard:profile' %}"><i class="bx bx-user fs-5"></i><span>Profile</span></a></li>
                     {% endif %}
                     {% if request.user.is_authenticated and request.user.is_superuser or request.user.is_staff %}
-                    <li><a class="dropdown-item d-flex align-items-center" href="{% url 'accounts:logout' %}"><i class="bx bx-log-out-circle"></i><span>Logout</span></a></li>
+                    <li>
+                        <form method="post" action="{% url 'accounts:logout' %}">
+                            {% csrf_token %}
+                            <button type="submit" class="dropdown-item d-flex align-items-center">
+                                <i class="bx bx-log-out-circle"></i><span>Logout</span>
+                            </button>
+                        </form>
+                    </li>
                     {% else %}
                     <button type="button" class="btn btn-light" style="width: 100%;" data-bs-toggle="modal" data-bs-target="#loginModal">Login</button>
                     {% endif %}

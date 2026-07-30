@@ -14,7 +14,7 @@ $(function () {
         parsed = [];
     }
 
-    var seriesData = (Array.isArray(parsed) && parsed.length)
+    var seriesData = Array.isArray(parsed)
         ? parsed.map(function (d) {
             return {
                 name: d.name || d.label || d.theme || 'Item',
@@ -23,15 +23,7 @@ $(function () {
                    typeof d.count === 'number' ? d.count : 0
             };
         })
-        : [
-            { name: "Agriculture", y: 10 },
-            { name: "Engineering", y: 20 },
-            { name: "Health Sciences", y: 30 },
-            { name: "Humanities", y: 40 },
-            { name: "Law", y: 50 },
-            { name: "Natural Sciences", y: 60 },
-            { name: "Social Sciences", y: 70 }
-        ];
+        : [];
 
     Highcharts.chart('thematic-chart', {
         chart: {
@@ -39,8 +31,16 @@ $(function () {
             type: 'column'
         },
         credits: { enabled: false },
-        title: { text: 'Research Thematic Areas' },
-        xAxis: { type: 'category' },
+        title: {
+            text: seriesData.length ? 'Research Thematic Areas' : 'No classified publications yet'
+        },
+        xAxis: {
+            type: 'category',
+            labels: {
+                rotation: -35,
+                style: { fontSize: '11px' }
+            }
+        },
         yAxis: { title: { text: 'Total Publications' } },
         legend: { enabled: false },
         plotOptions: {

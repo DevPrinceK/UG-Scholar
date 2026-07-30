@@ -7,12 +7,15 @@ app_name = "dashboard"
 # dashboard
 urlpatterns = [
     path('', views.IndexView.as_view(), name='index'),
+    path('search/', views.GlobalSearchView.as_view(), name='global_search'),
 ]
 
 # administrators
 urlpatterns += [
     path('administrators/', views.AdministratorsView.as_view(), name='administrators'),
     path('create-administrator/', views.CreateUpdateAdministratorView.as_view(), name='create_administrator'), #noqa
+    path('manual-fetch/', views.ManualFetchView.as_view(), name='manual_fetch'),
+    path('manual-fetch/status/', views.ManualFetchStatusView.as_view(), name='manual_fetch_status'),
 ]
 
 # author and publications

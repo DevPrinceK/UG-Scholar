@@ -9,6 +9,7 @@ from django.utils import timezone
 from api.models import Author, Profile, Publication, SyncRun
 from api.providers import get_provider
 from api.providers.base import ProviderError
+from api.services.thematic import classify_publication_metadata
 
 
 def _as_int(value, default=0):
@@ -26,12 +27,19 @@ def _fallback_external_id(article):
     return f"fingerprint:{hashlib.sha256(fingerprint.encode('utf-8')).hexdigest()}"
 
 
-def _normalized_article(article, provider_name, synced_at):
+def _normalized_article(article, provider_name, synced_at, profile=None):
     external_id = (
         article.get("external_id")
         or article.get("article_citation_id")
         or article.get("doi")
         or _fallback_external_id(article)
+    )
+    provider_topics = article.get("provider_topics") or []
+    classification = classify_publication_metadata(
+        title=article.get("article_title"),
+        journal=article.get("article_publication"),
+        provider_topics=provider_topics,
+        profiles=[profile] if profile else [],
     )
     return {
         "source": article.get("source") or provider_name,
@@ -44,6 +52,10 @@ def _normalized_article(article, provider_name, synced_at):
         "authors": article.get("article_authors") or "",
         "journal": article.get("article_publication") or "",
         "citations": _as_int(article.get("article_cited_by_value")),
+        "provider_topics": provider_topics,
+        "thematic_area": classification["area"],
+        "thematic_confidence": classification["confidence"],
+        "thematic_evidence": classification["evidence"],
         "last_synced_at": synced_at,
     }
 
@@ -59,6 +71,10 @@ def _publication_changed(publication, values):
         "authors",
         "journal",
         "citations",
+        "provider_topics",
+        "thematic_area",
+        "thematic_confidence",
+        "thematic_evidence",
         "last_synced_at",
     ):
         if getattr(publication, field) != values[field]:
@@ -76,7 +92,9 @@ def persist_author_data(profile, payload, provider_name):
     author_data = payload.get("author_data") or {}
     normalized = {}
     for raw_article in payload.get("author_articles") or []:
-        values = _normalized_article(raw_article, provider_name, synced_at)
+        values = _normalized_article(
+            raw_article, provider_name, synced_at, profile=profile
+        )
         normalized[(values["source"], values["external_id"])] = values
 
     profile.name = author_data.get("name") or profile.name
@@ -161,6 +179,10 @@ def persist_author_data(profile, payload, provider_name):
                 "authors",
                 "journal",
                 "citations",
+                "provider_topics",
+                "thematic_area",
+                "thematic_confidence",
+                "thematic_evidence",
                 "last_synced_at",
             ],
         )
@@ -222,13 +244,21 @@ def queue_sync(requested_by=None, profile_ids=None, provider_name=None):
 
 
 def process_sync_run(run):
-    with transaction.atomic():
-        locked = SyncRun.objects.select_for_update().get(pk=run.pk)
-        if locked.status != SyncRun.Status.PENDING:
-            return locked
-        locked.status = SyncRun.Status.RUNNING
-        locked.started_at = timezone.now()
-        locked.save(update_fields=["status", "started_at"])
+    # A conditional UPDATE is an atomic claim on both SQLite and PostgreSQL.
+    # It prevents two web/worker processes that observe the same pending row
+    # from fetching and charging the external provider twice.
+    claimed = SyncRun.objects.filter(
+        pk=run.pk,
+        status=SyncRun.Status.PENDING,
+    ).update(
+        status=SyncRun.Status.RUNNING,
+        started_at=timezone.now(),
+        finished_at=None,
+        error="",
+    )
+    run.refresh_from_db()
+    if not claimed:
+        return run
 
     try:
         provider = get_provider(run.provider)
@@ -241,6 +271,11 @@ def process_sync_run(run):
     profiles = Profile.objects.all().order_by("pk")
     if run.profile_ids:
         profiles = profiles.filter(pk__in=run.profile_ids)
+    if run.processed_profiles:
+        # Interrupted runs retain their completed-author count. Since profiles
+        # are deterministically ordered, resume at the first unfinished author
+        # instead of repeating provider requests (especially paid SerpAPI calls).
+        profiles = profiles[run.processed_profiles :]
 
     errors = []
     for profile in profiles.iterator(chunk_size=100):

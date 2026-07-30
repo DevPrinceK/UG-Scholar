@@ -22,6 +22,14 @@ class Publication(models.Model):
     authors = models.CharField(max_length=2000, blank=True, null=True)
     journal = models.CharField(max_length=500, blank=True, null=True)
     citations = models.IntegerField(default=0, db_index=True)
+    provider_topics = models.JSONField(default=list, blank=True)
+    thematic_area = models.CharField(
+        max_length=64,
+        default="Multidisciplinary / Unclassified",
+        db_index=True,
+    )
+    thematic_confidence = models.FloatField(default=0)
+    thematic_evidence = models.JSONField(default=dict, blank=True)
     last_synced_at = models.DateTimeField(blank=True, null=True, db_index=True)
 
     def get_author_name(self) -> str:

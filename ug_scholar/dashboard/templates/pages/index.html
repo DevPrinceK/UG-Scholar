@@ -115,7 +115,7 @@
                         <div class="chart-js-container1">
                             <!-- <canvas id="apexChart" data-performance=""></canvas> -->
                             <!-- Highcharts requires a div container, not a canvas -->
-                            <div id="thematic-chart" data-performance=""></div>
+                            <div id="thematic-chart" data-performance="{{ thematic_areas_json }}"></div>
                         </div>
 
                     </div>
@@ -256,7 +256,7 @@
                 </div>
             </div>
             <div class="col d-flex">
-                <div class="card radius-10 w-100" style="overflow-y: scroll;">
+                <div class="card radius-10 w-100">
                     <div class="card-header">
                         <div class="d-flex align-items-center">
                             <div>
@@ -264,7 +264,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="product-list p-3 mb-3">
+                    <div class="top-cited-publications-list p-3 mb-3">
                         {% for publication in top_10_publications %}
                         <div class="d-flex flex-column gap-3 mb-1">
                             <div class="d-flex align-items-center justify-content-between gap-3 p-2 border radius-10">

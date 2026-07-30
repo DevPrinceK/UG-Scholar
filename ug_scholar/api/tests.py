@@ -1,10 +1,16 @@
+from unittest.mock import Mock, patch
+
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings
 from rest_framework.test import APIClient
 
 from api.models import Author, Profile, Publication, SyncRun
-from api.services import queue_sync, sync_profile
+from api.services import process_sync_run, queue_sync, sync_profile
+from api.services.thematic import (
+    UNCLASSIFIED_AREA,
+    classify_publication_metadata,
+)
 from ug_scholar.library.utils_functions import get_author_ids
 
 
@@ -84,12 +90,76 @@ class SyncServiceTests(TestCase):
         self.assertEqual(self.profile.data_source, "openalex")
         self.assertEqual(self.profile.h_index, 2)
 
+    def test_sync_persists_provider_topics_and_thematic_classification(self):
+        article = {
+            **FakeProvider().articles[0],
+            "article_title": "Malaria epidemiology and disease prevalence",
+            "provider_topics": [
+                {
+                    "name": "Malaria epidemiology",
+                    "field": "Medicine",
+                    "domain": "Health Sciences",
+                    "score": 0.99,
+                    "primary": True,
+                }
+            ],
+        }
+        sync_profile(self.profile, FakeProvider([article]))
+        publication = Publication.objects.get()
+        self.assertEqual(publication.thematic_area, "Health Sciences")
+        self.assertGreater(publication.thematic_confidence, 0.5)
+        self.assertEqual(
+            publication.thematic_evidence["method"],
+            "provider_topic_plus_metadata",
+        )
+        self.assertEqual(publication.provider_topics[0]["domain"], "Health Sciences")
+
     def test_duplicate_queue_request_reuses_pending_run(self):
         first, created = queue_sync(profile_ids=[self.profile.pk])
         second, second_created = queue_sync(profile_ids=[self.profile.pk])
         self.assertTrue(created)
         self.assertFalse(second_created)
         self.assertEqual(first.pk, second.pk)
+
+    @patch("api.services.sync.get_provider")
+    def test_pending_run_is_claimed_and_completed(self, get_provider):
+        get_provider.return_value = FakeProvider()
+        run, _ = queue_sync(profile_ids=[self.profile.pk])
+
+        completed = process_sync_run(run)
+
+        completed.refresh_from_db()
+        self.assertEqual(completed.status, SyncRun.Status.SUCCEEDED)
+        self.assertEqual(completed.processed_profiles, 1)
+        self.assertEqual(completed.updated_publications, 2)
+        self.assertIsNotNone(completed.started_at)
+        self.assertIsNotNone(completed.finished_at)
+
+    @patch("api.services.sync.get_provider")
+    def test_already_claimed_run_is_not_processed_twice(self, get_provider):
+        run, _ = queue_sync(profile_ids=[self.profile.pk])
+        SyncRun.objects.filter(pk=run.pk).update(status=SyncRun.Status.RUNNING)
+
+        result = process_sync_run(run)
+
+        self.assertEqual(result.status, SyncRun.Status.RUNNING)
+        get_provider.assert_not_called()
+
+    @patch("api.services.sync.get_provider")
+    def test_interrupted_run_resumes_after_completed_profiles(self, get_provider):
+        provider = FakeProvider()
+        provider.fetch_author = Mock(wraps=provider.fetch_author)
+        get_provider.return_value = provider
+        run, _ = queue_sync(profile_ids=[self.profile.pk])
+        SyncRun.objects.filter(pk=run.pk).update(processed_profiles=1)
+        run.refresh_from_db()
+
+        completed = process_sync_run(run)
+
+        completed.refresh_from_db()
+        self.assertEqual(completed.status, SyncRun.Status.SUCCEEDED)
+        self.assertEqual(completed.processed_profiles, 1)
+        provider.fetch_author.assert_not_called()
 
 
 class ApiPermissionTests(TestCase):
@@ -108,6 +178,40 @@ class ApiPermissionTests(TestCase):
         response = client.post("/api/populate-db/", {}, format="json")
         self.assertEqual(response.status_code, 202)
         self.assertEqual(SyncRun.objects.count(), 1)
+
+
+class ThematicClassificationTests(TestCase):
+    def test_business_title_is_classified_as_social_sciences(self):
+        result = classify_publication_metadata(
+            title="Capital structure and profitability of listed firms",
+            journal="Journal of Finance",
+        )
+        self.assertEqual(result["area"], "Social Sciences")
+        self.assertGreater(result["confidence"], 0)
+
+    def test_author_department_is_a_low_weight_fallback(self):
+        profile = Profile(
+            scholar_id="law-author",
+            department="School of Law",
+            college="College of Humanities",
+        )
+        result = classify_publication_metadata(
+            title="A comparative analysis",
+            profiles=[profile],
+        )
+        self.assertEqual(result["area"], "Law")
+        self.assertEqual(result["evidence"]["method"], "metadata_heuristic")
+
+    def test_no_signal_remains_explicitly_unclassified(self):
+        result = classify_publication_metadata(title="A comparative analysis")
+        self.assertEqual(result["area"], UNCLASSIFIED_AREA)
+        self.assertEqual(result["confidence"], 0)
+
+    def test_specialized_finance_vocabulary_is_social_sciences(self):
+        result = classify_publication_metadata(
+            title="A GARCH-MIDAS approach to modelling stock returns",
+        )
+        self.assertEqual(result["area"], "Social Sciences")
 
 
 class CsvImportTests(TestCase):
